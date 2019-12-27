@@ -79,5 +79,10 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'src'),
     hot: true,
-  }
+  },
+  resolve: {
+    alias: {
+      '@': path.join(__dirname, 'src')
+    }
+  },
 }
