@@ -5,9 +5,6 @@ import { Menu, Icon } from 'antd';
 import menuConfig from './menu.config';
 
 export default function SideMenu(props) {
-  const handelLink = path => {
-    history.pushState(path);
-  };
   return (
     <Menu
       mode="inline"
@@ -25,10 +22,10 @@ export default function SideMenu(props) {
           }
           >
           {
-            menu.children && menu.children.map((childMenu, j) =>
-              <Link to={childMenu.path}>
-                <Menu.Item key={j} onClick={() => handelLink(childMenu.path)}>{childMenu.title}</Menu.Item>
-              </Link>
+            menu.children && menu.children.map(childMenu =>
+              <Menu.Item key={childMenu.path}>
+                <Link to={childMenu.path}>{childMenu.title}</Link>
+              </Menu.Item>
             )
           }
         </Menu.SubMenu>

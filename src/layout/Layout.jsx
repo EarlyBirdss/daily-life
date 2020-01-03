@@ -1,7 +1,7 @@
 import React from 'react';
-import { Layout, Breadcrumb } from 'antd';
-import RoutePage from './Route.jsx';
+import { Layout } from 'antd';
 import SideMenu from './Menu.jsx';
+import Breadcrumb from './Breadcrumb.jsx';
 
 import './style.less';
 
@@ -17,10 +17,7 @@ export default function App(props) {
       </Sider>
       <Layout>
         <Content style={{ padding: '20px 30px' }}>
-          <Breadcrumb>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb props={[{ path: '/', label: '首页' }]}></Breadcrumb>
           <Layout className="main-content">{ props.children }</Layout>
         </Content>
       </Layout>

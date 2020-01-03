@@ -1,31 +1,35 @@
 import React from 'react';
-import { Route, Router } from 'react-router';
+import dva from 'dva';
+import { Route, Router } from 'dva/router';
+// TODO: indexRoute
 // import { IndexRoute } from 'react-router-dom';
 import { createHashHistory } from 'history';
-import { Button } from 'antd/lib/radio';
+import { message } from 'antd';
 
 import routeConfig from './route.config';
 import App from './Layout.jsx';
 
-const Welcome = () => <Button>Mathilda</Button>;
-const NotFund = () =>  <Button>NotFund</Button>;
+const history = createHashHistory();
 
-const hashHistory = createHashHistory();
-
-console.log(routeConfig.map(({ path, component }) => (
-  <Route path={path} component={component} key={path} />
-)))
-export default function RoutePage(props) {
-  return (
-    <Router history={hashHistory}>
-      <App>
-          {/* <IndexRoute component={Welcome} /> */}
+function WithDav() {
+  const app = dva({
+    history,
+    onError: e => message.error(e.message),
+  });
+  app.router(({ history }) => {
+    return (
+      <Router history={history}>
+        <App>
           {
             routeConfig.map(({ path, component }) => (
               <Route path={path} component={component} key={path} />
             ))
           }
-      </App>
-    </Router>
-  )
-}
+        </App>
+      </Router>
+    )
+  });
+  return app.start()();
+};
+
+export default WithDav;
