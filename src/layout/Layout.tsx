@@ -1,7 +1,7 @@
-import React from 'react';
+import * as React from 'react';
 import { Layout } from 'antd';
-import SideMenu from './Menu.jsx';
-import Breadcrumb from './Breadcrumb.jsx';
+import SideMenu from './Menu';
+import Breadcrumb from './Breadcrumb';
 
 import './style.less';
 

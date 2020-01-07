@@ -7,7 +7,7 @@ import { createHashHistory } from 'history';
 import { message } from 'antd';
 
 import routeConfig from './route.config';
-import App from './Layout.jsx';
+import App from './Layout';
 
 const history = createHashHistory();
 

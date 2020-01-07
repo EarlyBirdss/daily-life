@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 import Layout from './layout';
+import './index.less';
 
-const App = <Layout></Layout>
-ReactDOM.render(App, document.getElementById('#app'));
+ReactDOM.render(<Layout />, document.getElementById('#app'));

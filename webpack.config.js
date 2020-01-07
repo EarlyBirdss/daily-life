@@ -2,48 +2,28 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   mode: 'none',
-  devtool: "inline-source-map",
-  resolve: {
-    extensions: [".ts", ".tsx", ".js"]
-  },
-  devServer: {
-    hot: true,
-  },
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
         test: /\.(css|less)$/,
-        // use: [
-        //   { loader: 'style-loader' },
-        //   { loader: 'css-loader' },
-        //   { loader: 'less-loader' },
-        // ]
-        loader: ['style-loader', 'css-loader', 'less-loader']
+        loader: ['style-loader', 'css-loader', 'less-loader'],
+        exclude: path.resolve(__dirname, 'node_modules'),
       },
       {
-        test: /\.jsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-react'],
-            plugins: [
-              ['import', {
-                libraryName: 'antd',
-                libraryDirectory: 'es',
-                style: 'css'
-              }]
-            ]
-          }
-        },
-        exclude: path.resolve(__dirname, "node_modules"),
-        // use: [
-        //   { loader: 'script-loader' },
-        //   {
-        //     loader: 'ts-loader',
-        //   },
-        // ]
+        test: /\.(tsx?)/,
+        loader: []
+      },
+      {
+        test: /\.(ts|js)x?$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
+        exclude: path.resolve(__dirname, 'node_modules'),
       },
       // {
       //   test: /\.html$/,
@@ -63,7 +43,8 @@ module.exports = {
           {
             loader: 'file-loader',
           }
-        ]
+        ],
+        exclude: path.resolve(__dirname, 'node_modules'),
       }
     ]
   },
@@ -83,6 +64,7 @@ module.exports = {
   resolve: {
     alias: {
       '@': path.join(__dirname, 'src')
-    }
+    },
+    extensions: ['.ts', '.tsx', '.json', '.js',]
   },
 }
