@@ -94,5 +94,8 @@ You may need an additional loader to handle the result of these loaders.
 #### 2020.01.06 接入typescript后出现样式消失
 解决思路：查看antd文档，查看“在typescript使用”， 按照指引新建index.less，引入'~antd/dist/antd.css'文件，问题解决。
 
+#### 2020.01.06 接入数据请求库的选择
+在fetch和request库中抉择， fetch API是简单标准化的API，可以直接使用不需要引库；request是使用比较广泛的极简至上的库，也是公司项目使用的库，使用上比较熟悉。最终决定使用fetch，原因是作为一个标准的api却没有在项目中用过，这次刚好是个机会。
 
-
+使用fetch-mock作为mock库
+####

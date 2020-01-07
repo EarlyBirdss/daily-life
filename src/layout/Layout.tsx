@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Layout } from 'antd';
 import SideMenu from './Menu';
 import Breadcrumb from './Breadcrumb';

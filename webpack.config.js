@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -19,6 +20,9 @@ module.exports = {
       {
         test: /\.(ts|js)x?$/,
         use: [
+          // {
+          //   loader: 'react-hot',
+          // },
           {
             loader: 'babel-loader',
           },
@@ -52,6 +56,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/index.html')
     }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
   output: {
     path: path.resolve(__dirname, 'dist'),
