@@ -1,49 +1,49 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   mode: 'none',
-  devtool: "inline-source-map",
-  resolve: {
-    extensions: [".ts", ".tsx", ".js"]
-  },
-  devServer: {
-    hot: true,
-  },
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
         test: /\.(css|less)$/,
-        // use: [
-        //   { loader: 'style-loader' },
-        //   { loader: 'css-loader' },
-        //   { loader: 'less-loader' },
-        // ]
-        loader: ['style-loader', 'css-loader', 'less-loader']
+        use: [
+          {
+            loader: 'style-loader'
+          },
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              // 配置无效，待检查
+              modifyVars: {
+                'primary-color': '#cd8383',
+                'link-color': '#f6cca3',
+                // 'hack': `true; @import "styles/antd-theme.less";`,
+              },
+              javascriptEnabled: true,
+            }
+          }
+        ],
+        exclude: path.resolve(__dirname, 'node_modules'),
       },
       {
-        test: /\.jsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-react'],
-            plugins: [
-              ['import', {
-                libraryName: 'antd',
-                libraryDirectory: 'es',
-                style: 'css'
-              }]
-            ]
-          }
-        },
-        exclude: path.resolve(__dirname, "node_modules"),
-        // use: [
-        //   { loader: 'script-loader' },
-        //   {
-        //     loader: 'ts-loader',
-        //   },
-        // ]
+        test: /\.(tsx?)/,
+        loader: []
+      },
+      {
+        test: /\.(ts|js)x?$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
+        exclude: path.resolve(__dirname, 'node_modules'),
       },
       // {
       //   test: /\.html$/,
@@ -54,16 +54,11 @@ module.exports = {
       {
         test: /\.(png|jpg|jpeg|gif)$/i,
         use: [
-          // {
-          //   loader: 'url-loader',
-          //   options: {
-          //     limit: 8192
-          //   }
-          // },
           {
             loader: 'file-loader',
           }
-        ]
+        ],
+        exclude: path.resolve(__dirname, 'node_modules'),
       }
     ]
   },
@@ -71,6 +66,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/index.html')
     }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -79,5 +75,11 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'src'),
     hot: true,
-  }
+  },
+  resolve: {
+    alias: {
+      '@': path.join(__dirname, 'src')
+    },
+    extensions: ['.ts', '.tsx', '.json', '.js',]
+  },
 }
