@@ -1,3 +1,3 @@
-import Layout from './Route';
+import Layout from './Layout';
 
 export default Layout;

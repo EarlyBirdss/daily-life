@@ -10,7 +10,26 @@ module.exports = {
     rules: [
       {
         test: /\.(css|less)$/,
-        loader: ['style-loader', 'css-loader', 'less-loader'],
+        use: [
+          {
+            loader: 'style-loader'
+          },
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              // 配置无效，待检查
+              modifyVars: {
+                'primary-color': '#cd8383',
+                'link-color': '#f6cca3',
+                // 'hack': `true; @import "styles/antd-theme.less";`,
+              },
+              javascriptEnabled: true,
+            }
+          }
+        ],
         exclude: path.resolve(__dirname, 'node_modules'),
       },
       {
@@ -20,9 +39,6 @@ module.exports = {
       {
         test: /\.(ts|js)x?$/,
         use: [
-          // {
-          //   loader: 'react-hot',
-          // },
           {
             loader: 'babel-loader',
           },
@@ -38,12 +54,6 @@ module.exports = {
       {
         test: /\.(png|jpg|jpeg|gif)$/i,
         use: [
-          // {
-          //   loader: 'url-loader',
-          //   options: {
-          //     limit: 8192
-          //   }
-          // },
           {
             loader: 'file-loader',
           }

@@ -1,17 +1,26 @@
 import React from 'react';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
+import { connect } from 'dva';
 
-export default function PageBreadcrumb({ props }) {
-  // TODO: 从router config中拿数据
+interface BreadcrumbConfig {
+  path: string,
+  name: string,
+}
+
+function PageBreadcrumb({ breadcrumbConfig }: { breadcrumbConfig: Array<BreadcrumbConfig> } ) {
   return (
     <Breadcrumb>
       {
-        props.map(({ path, label }) =>
+        breadcrumbConfig.map(({ path, name }) =>
           <Breadcrumb.Item key={path}>
-            <Link to={path}>{label}</Link>
+            <Link to={path}>{name}</Link>
           </Breadcrumb.Item>)
       }
     </Breadcrumb>
   )
 }
+
+export default connect(
+  ({ GlobalModel: { breadcrumbConfig } }: { GlobalModel: { breadcrumbConfig: Array<BreadcrumbConfig> } }) => ({ breadcrumbConfig })
+)(PageBreadcrumb)

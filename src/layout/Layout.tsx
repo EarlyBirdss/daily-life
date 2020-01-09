@@ -1,18 +1,18 @@
 import React from 'react';
 import { Layout } from 'antd';
-import SideMenu from './Menu';
+import { connect } from 'dva';
+import SideMenu from './SideMenu';
 import Breadcrumb from './Breadcrumb';
 
 import './style.less';
 
 const { Content, Sider } = Layout;
 
-export default function App(props) {
+export default function MainLayout(props: any) {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider theme="light" style={{ width: 200 }}>
-        <div className="logo">
-        </div>
+        <div className="logo">Mathilda's Little Cabin</div>
         <SideMenu></SideMenu>
       </Sider>
       <Layout>

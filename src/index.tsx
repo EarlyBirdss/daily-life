@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import Layout from './layout';
-import './index.less';
-import './mock';
+import App from './Route';
+import '@/styles/index.less';
+import '@/mock';
 
-ReactDOM.render(<Layout />, document.getElementById('#app'));
+ReactDOM.render(<App />, document.getElementById('#app'));
