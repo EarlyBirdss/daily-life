@@ -13,7 +13,10 @@ import {
   Typography,
   Tag,
   Divider,
-  message
+  InputNumber,
+  Checkbox,
+  Popover,
+  message,
 } from 'antd';
 import { columns } from './options';
 import { fetchDiaryList, fetchModuleList } from './service';
@@ -47,7 +50,7 @@ const QueryForm = props => {
       } else {
         onSubmit({});
       }
-    })
+    });
   };
   const handleReset = () => {
     form.resetFields();
@@ -61,7 +64,7 @@ const QueryForm = props => {
           {getFieldDecorator('dateRange')(<DatePicker.RangePicker />)}
         </Form.Item>
         <Form.Item label="当前第N天">
-          {getFieldDecorator('day')(<Input placeholder="请输入" />)}
+          {getFieldDecorator('day')(<InputNumber placeholder="请输入" />)}
         </Form.Item>
         <Form.Item label="模块">
           {getFieldDecorator('module')(
@@ -98,15 +101,18 @@ const QueryForm = props => {
 };
 
 const DataTable = props => {
-  const { list, customsColumns, pagination } = props;
+  const { list, customsColumns, pagination, onSubmit, form } = props;
   const formatedCustomsColumns = customsColumns.map(({ id, name }) => ({
     dataIndex: `module_${id}`,
     title: name,
   }));
   const placeholderIndex = columns.findIndex(({ dataIndex }) => dataIndex === 'placeholder');
-  columns.splice(placeholderIndex, 0, ...formatedCustomsColumns);
-  let newColumn = columns.filter(({ dataIndex }) => dataIndex !== 'placeholder');
-  const filters = newColumn.map(({ dataIndex, title }) => ({ text: title, value: dataIndex }));
+  let newColumn = [...columns];
+  newColumn.splice(placeholderIndex, 0, ...formatedCustomsColumns);
+  newColumn = newColumn.filter(({ dataIndex }) => dataIndex !== 'placeholder');
+  const [finalColumn, setFinalColumn] = useState(newColumn);
+  const filters = newColumn.map(({ dataIndex, title }) => ({ label: title, value: dataIndex }));
+  const filterDefaultValue = filters.map(({ value }) => value);
   const operateColumn = {
     dataIndex: '_',
     title: '操作',
@@ -115,21 +121,53 @@ const DataTable = props => {
     render: (_, { id }) => (
       <>
         <Button type="link" style={{ padding: 0, marginRight: 8 }}>修改</Button>
-        <Button type="link" style={{ padding: 0 }}>修改日志</Button>
+        <Button type="link" style={{ padding: 0 }}>查看修改日志</Button>
       </>
     )
   };
-  const handleFilterPop = () => {
-    // TODO: 筛选columns功能
+  const handleFilterChange = (values: Array<string>) => {
+    newColumn = newColumn.filter(({ dataIndex }) => values.includes(dataIndex));
+    setFinalColumn(newColumn);
   };
+  const handleTableChange = (pagination, filters, sorter) => {
+    const { field, order } = sorter;
+    form.validateFields((err, value) => {
+      const sortConfig = {
+        sortFiled: field,
+        sortOrder: order,
+      };
+      if (!err) {
+        onSubmit({...value, current: 1, ...sortConfig});
+      }
+    });
+  }
+
   return (
     <>
-      <Button type="primary" icon="filter" style={{ margin: "10px 0", float: "right" }} onClick={handleFilterPop}>筛选</Button>
+      <Popover
+        placement="bottomRight"
+        trigger="click"
+        title="请选择展示项"
+        content={ <Checkbox.Group options={filters} defaultValue={filterDefaultValue} onChange={handleFilterChange}></Checkbox.Group> }
+      >
+        <Button
+          type="primary"
+          icon="filter"
+          style={{ margin: "10px 0", float: "right" }}
+        >筛选</Button>
+      </Popover>
       <Table
         dataSource={list}
-        columns={[...newColumn, operateColumn]}
+        columns={[...finalColumn, operateColumn]}
         style={{ marginTop: 20 }}
-        {...pagination}
+        onChange={handleTableChange}
+        pagination={{
+          showTotal: total => `共${total}条`,
+          showSizeChanger: true,
+          pageSize: 7,
+          pageSizeOptions: ['7', '14', '30'],
+          ...pagination
+        }}
         rowKey="id"
         >
       </Table>
@@ -158,6 +196,7 @@ const ConclusionPanel = props => {
 };
 
 function Diary(props) {
+  const { form } = props;
   const [listConfig, setListConfig] = useState({ list: [], pagination: {}, customsColumns: [] });
   useEffect(() => {
     fetchDiaryList({})
@@ -176,7 +215,7 @@ function Diary(props) {
   return (
     <>
       <QueryForm {...props} onSubmit={onQueryFormSubmit} />
-      <DataTable {...listConfig} />
+      <DataTable {...listConfig} form={form} onSubmit={onQueryFormSubmit} />
       <ConclusionPanel />
     </>
   );
