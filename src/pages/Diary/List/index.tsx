@@ -4,7 +4,6 @@ import {
   Form,
   Table,
   DatePicker,
-  Input,
   Switch,
   Icon,
   Button,
@@ -23,28 +22,32 @@ import { fetchDiaryList, fetchModuleList } from './service';
 
 const { Option } = Select;
 
-const QueryForm = props => {
+interface QueryFormProps {
+  form: { validateFields: any, getFieldDecorator: any, resetFields: any },
+  onSubmit: any
+}
+const QueryForm = (props: QueryFormProps) => {
   const { form, onSubmit } = props;
   const { getFieldDecorator } = form;
   const [moduleList, setModuleList] = useState([]);
   const [childModuleList, setChildModuleList] = useState([]);
   useEffect(() => {
     fetchModuleList()
-      .then(({ data }) => {
+      .then(({ data = [] }: { data: Array<{ id: string|number, name: string, children?:Array<any> }> }) => {
         setModuleList(data);
       });
   }, []);
-  const handleModuleChange = values => {
+  const handleModuleChange = (values: Array<string|number>) => {
     const modules = values.map(value => {
       const module = moduleList.find(({ id }) => id === value);
       return module.children || [];
     });
 
-    setChildModuleList(modules.reduce((a, b) => [...a, ...b], []));
+    setChildModuleList(modules.reduce((a: Array<any>, b: Array<any>) => [...a, ...b], []));
   };
-  const handleQuery = e => {
+  const handleQuery = (e: any) => {
     e.preventDefault();
-    form.validateFields((err, value) => {
+    form.validateFields((err: any, value: any) => {
       if (!err) {
         onSubmit({...value});
       } else {
@@ -87,7 +90,7 @@ const QueryForm = props => {
             </Form.Item>
         }
         <Form.Item label="是否已完成">
-          {getFieldDecorator('sortBy', {
+          {getFieldDecorator('isCompleted', {
             valuePropName: 'checked'
           })(<Switch checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="close" />} />)}
         </Form.Item>
@@ -100,9 +103,16 @@ const QueryForm = props => {
   )
 };
 
-const DataTable = props => {
+interface DataTableProps {
+  list: Array<object>,
+  customsColumns: Array<{ id: string, name: string }>,
+  pagination: object,
+  onSubmit: any,
+  form: { validateFields: any }
+}
+const DataTable = (props: DataTableProps) => {
   const { list, customsColumns, pagination, onSubmit, form } = props;
-  const formatedCustomsColumns = customsColumns.map(({ id, name }) => ({
+  const formatedCustomsColumns = customsColumns.map(({ id, name }: { id: string, name: string }) => ({
     dataIndex: `module_${id}`,
     title: name,
   }));
@@ -118,7 +128,7 @@ const DataTable = props => {
     title: '操作',
     fixed: 'right',
     width: 200,
-    render: (_, { id }) => (
+    render: (_, { id }: { id: number }) => (
       <>
         <Button type="link" style={{ padding: 0, marginRight: 8 }}>修改</Button>
         <Button type="link" style={{ padding: 0 }}>查看修改日志</Button>
@@ -129,9 +139,9 @@ const DataTable = props => {
     newColumn = newColumn.filter(({ dataIndex }) => values.includes(dataIndex));
     setFinalColumn(newColumn);
   };
-  const handleTableChange = (pagination, filters, sorter) => {
+  const handleTableChange = (pagination: any, filters: any, sorter: any) => {
     const { field, order } = sorter;
-    form.validateFields((err, value) => {
+    form.validateFields((err: any, value: any) => {
       const sortConfig = {
         sortFiled: field,
         sortOrder: order,
@@ -174,15 +184,17 @@ const DataTable = props => {
     </>
   )
 }
-
-const ConclusionPanel = props => {
-  const list = [{ name: '阅读', times: '14' }, { name: 'EF UNIT', times: '7' }];
+interface ReportPanelProps {
+  reportList: Array<{ name: string, times: number }>
+}
+const ReportPanel = (props: ReportPanelProps) => {
+  const { reportList } = props;
   return (
     <>
       <Divider orientation="left">结果统计</Divider>
       <List
         header={<div>今日计划</div>}
-        dataSource={list}
+        dataSource={reportList}
         bordered
         renderItem={item => (
           <List.Item>
@@ -195,19 +207,29 @@ const ConclusionPanel = props => {
   )
 };
 
-function Diary(props) {
+// interface QueryFormParams {
+//   dateRange?: Array<string>,
+//   day?: number,
+//   module?: Array<string>,
+//   childModule?: Array<string>,
+//   isCompleted?: Boolean,
+//   sortFiled?: string,
+//   sortOrder?: string,
+// }
+function Diary(props: any) {
   const { form } = props;
   const [listConfig, setListConfig] = useState({ list: [], pagination: {}, customsColumns: [] });
+  const reportList = [{ name: '阅读', times: 14 }, { name: 'EF UNIT', times: 7 }];
   useEffect(() => {
     fetchDiaryList({})
-      .then(({ data }) => {
+      .then(({ data = [] }: { data: Array<object> }) => {
         setListConfig(data);
       });
   }, []);
 
-  const onQueryFormSubmit = params => {
+  const onQueryFormSubmit = (params: object) => {
     fetchDiaryList(params)
-      .then(({ data }) => {
+      .then(({ data }: { data: Array<object> }) => {
         setListConfig(data);
       });
   };
@@ -216,7 +238,7 @@ function Diary(props) {
     <>
       <QueryForm {...props} onSubmit={onQueryFormSubmit} />
       <DataTable {...listConfig} form={form} onSubmit={onQueryFormSubmit} />
-      <ConclusionPanel />
+      <ReportPanel reportList={reportList} />
     </>
   );
 }
