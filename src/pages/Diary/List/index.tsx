@@ -130,7 +130,8 @@ const DataTable = (props: DataTableProps) => {
     width: 200,
     render: (_, { id }: { id: number }) => (
       <>
-        <Button type="link" style={{ padding: 0, marginRight: 8 }}>修改</Button>
+        <Button type="link" href="/#/diary/detail" style={{ padding: 0, marginRight: 8 }}>查看</Button>
+        <Button type="link" href={`/diary/modify/${id}`} style={{ padding: 0, marginRight: 8 }}>修改</Button>
         <Button type="link" style={{ padding: 0 }}>查看修改日志</Button>
       </>
     )
