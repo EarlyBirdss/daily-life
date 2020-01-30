@@ -9,8 +9,12 @@ export default [
         path: '/diary/list',
       },
       {
+        name: '模块管理',
+        path: '/diary/module/config',
+      },
+      {
         name: '模板配置',
-        path: '/diary/config'
+        path: '/diary/template/config'
       }
     ],
   }
