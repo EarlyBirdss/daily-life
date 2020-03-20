@@ -22,7 +22,7 @@ module.exports = {
             options: {
               // 配置无效，待检查
               modifyVars: {
-                'primary-color': '#cd8383',
+                'primary-color': '#f00',
                 'link-color': '#f6cca3',
                 // 'hack': `true; @import "styles/antd-theme.less";`,
               },
@@ -30,7 +30,8 @@ module.exports = {
             }
           }
         ],
-        exclude: path.resolve(__dirname, 'node_modules'),
+        // antd 定制主题功能要求不能过滤node_modules
+        // exclude: path.resolve(__dirname, 'node_modules'),
       },
       {
         test: /\.(tsx?)/,

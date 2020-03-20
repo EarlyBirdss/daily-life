@@ -130,8 +130,8 @@ const DataTable = (props: DataTableProps) => {
     width: 200,
     render: (_, { id }: { id: number }) => (
       <>
-        <Button type="link" href="/#/diary/detail" style={{ padding: 0, marginRight: 8 }}>查看</Button>
-        <Button type="link" href={`/diary/modify/${id}`} style={{ padding: 0, marginRight: 8 }}>修改</Button>
+        <Button type="link" href={`/#/diary/detail/${id}`} style={{ padding: 0, marginRight: 8 }}>查看</Button>
+        <Button type="link" href={`/#/diary/modify/${id}`} style={{ padding: 0, marginRight: 8 }}>修改</Button>
         <Button type="link" style={{ padding: 0 }}>查看修改日志</Button>
       </>
     )
@@ -155,18 +155,23 @@ const DataTable = (props: DataTableProps) => {
 
   return (
     <>
-      <Popover
-        placement="bottomRight"
-        trigger="click"
-        title="请选择展示项"
-        content={ <Checkbox.Group options={filters} defaultValue={filterDefaultValue} onChange={handleFilterChange}></Checkbox.Group> }
-      >
-        <Button
-          type="primary"
-          icon="filter"
-          style={{ margin: "10px 0", float: "right" }}
-        >筛选</Button>
-      </Popover>
+      <div style={{ float: "right" }}>
+        {/* TODO: 样式优化 */}
+        <Button type="primary" icon="plus" style={{ marginRight: 10 }}>新增</Button>
+        <Button type="primary" icon="plus" style={{ marginRight: 10 }}>生成一周模版</Button>
+        <Popover
+          placement="bottomRight"
+          trigger="click"
+          title="请选择展示项"
+          content={ <Checkbox.Group options={filters} defaultValue={filterDefaultValue} onChange={handleFilterChange}></Checkbox.Group> }
+        >
+          <Button
+            type="primary"
+            icon="filter"
+            style={{ margin: "10px 0" }}
+          >筛选</Button>
+        </Popover>
+      </div>
       <Table
         dataSource={list}
         columns={[...finalColumn, operateColumn]}

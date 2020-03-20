@@ -1,5 +1,5 @@
 import { request } from '@/utils';
 
-export function getDairyList(params?: {}) {
-  return request('/getDairyList', { ...params });
+export function fetchDiaryList(params?: {}) {
+  return request('/diary/fetchDiaryList', { ...params });
 }

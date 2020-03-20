@@ -5,7 +5,7 @@ import Config from '@/pages/Config';
 
 export default [
   { path: '/diary/list', component: DiaryList },
-  { path: '/diary/detail', component: DiaryDetail },
-  { path: '/diary/modify', component: DiaryModify },
+  { path: '/diary/detail/:id', component: DiaryDetail },
+  { path: '/diary/modify/:id', component: DiaryModify },
   { path: '/diary/config', component: Config },
 ];

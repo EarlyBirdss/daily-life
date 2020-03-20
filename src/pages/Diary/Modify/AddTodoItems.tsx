@@ -48,7 +48,12 @@ function AddTodoItems(props: AddTodoItemProps){
   const handleRemoveInput = (index: number) => {
     newItems.splice(index, 1);
     setNewItems(newItems);
-  }
+  };
+
+  const handleClose = () => {
+    console.log(props);
+    props.onClose && props.onClose();
+  };
   return (
     <Drawer
       visible={true}
@@ -87,8 +92,8 @@ function AddTodoItems(props: AddTodoItemProps){
           )
         }
         <ButtonWrapper>
-          <Button type="primary" icon="save" style={{ marginRight: 10 }}>确认</Button>
-          <Button icon="close-square">取消</Button>
+          <Button type="primary" htmlType="submit" icon="save" style={{ marginRight: 10 }}>确认</Button>
+          <Button icon="close-square" onClick={handleClose}>取消</Button>
         </ButtonWrapper>
       </FormWrapper>
     </Drawer>

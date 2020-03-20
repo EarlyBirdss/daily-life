@@ -3,8 +3,26 @@
   <head>
     <meta charset="UTF-8">
     <title>Mathilda's Little Cabin</title>
+    <link rel="stylesheet/less" type="text/css" href="/styles/color.less" />
+    <script>
+      window.less = {
+        async: false,
+        env: 'production'
+      };
+    </script>
   </head>
   <body>
     <div id="#app"></div>
   </body>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
+  <script>
+  window.less
+    .modifyVars({
+      '@primary-color': '#0035ff'
+    })
+    .then(() => { })
+    .catch(error => {
+        message.error(`Failed to update theme`);
+    });
+  </script>
 </html>

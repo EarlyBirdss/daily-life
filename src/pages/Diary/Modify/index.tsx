@@ -87,6 +87,10 @@ function DiaryModify(props) {
     setAddTodoItemVisible(true);
   };
 
+  const handleTodoItemClose = () => {
+    setAddTodoItemVisible(false);
+  };
+
   return (
   // <DndProvider backend={HTML5Backend}>
     <div className="cb-panel">
@@ -146,7 +150,7 @@ function DiaryModify(props) {
       )
     }
     </Collapse>
-    {addTodoItemVisible && <AddTodoItems selectedItems={content.todoList} /> }
+    {addTodoItemVisible && <AddTodoItems selectedItems={content.todoList} onClose={handleTodoItemClose} /> }
     </div>
   // </DndProvider>
   )

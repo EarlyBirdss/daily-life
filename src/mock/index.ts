@@ -12,7 +12,7 @@ function createDiaryList() {
     sortId: index + 100,
     date: moment().subtract('days', 12 - index).format('YYYY-MM-DD HH:mm:ss'),
     completedModules: ['今日计划', '饮食', 'English Diary'],
-    modifyAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+    modifyTime: moment().format('YYYY-MM-DD HH:mm:ss'),
     grade: 90,
     module_10001: '√06:30起床',
     module_20001: '早餐'
@@ -173,7 +173,7 @@ function createConfig() {
   }
 }
 
-fetchMock.mock('/fetchDiaryList',
+fetchMock.mock('/diary/fetchDiaryList',
   { success: true, data: { list: createDiaryList(), pagitation: {  }, customsColumns: [{ id: 10001, name: '06:30起床' }, { id: 20001, name: '早餐' }] }, tip: '获取成功' },
   { delay: 100 }
 );
@@ -182,7 +182,7 @@ fetchMock.mock('/diary/fetchModuleList', { success: true, data: createModuleList
 
 fetchMock.mock('/diary/fetchTemplateList', { success: true, data: createTemplateList(), tip: '获取成功' });
 
-fetchMock.mock('/diary/fetchDetail', { success: true, data: createContent(), tip: '获取成功' });
+fetchMock.mock('/diary/fetchDiaryDetail', { success: true, data: createContent(), tip: '获取成功' });
 
 fetchMock.mock('/diary/fetchTemplateContent', { success: true, data: createTemplateContent(), tip: '获取成功' });
 

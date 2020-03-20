@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table } from 'antd';
-import { getDairyList } from './service';
+import { fetchDiaryList } from './service';
 
 export default function DiaryConfig() {
   const [list, setList] = useState([]);
   useEffect(() => {
-    getDairyList()
+    fetchDiaryList()
     .then(res => console.log(res))
   }, []);
   return (
