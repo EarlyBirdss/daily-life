@@ -34,5 +34,6 @@ export interface ControllerProps {
 export interface AddTodoItemProps {
   selectedItems: Array<TodoItemProps>,
   form: any,
+  onClose: any,
 }
 

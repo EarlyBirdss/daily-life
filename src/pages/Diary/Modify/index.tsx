@@ -17,7 +17,7 @@ import { Editor, EditorState } from 'draft-js';
 import { DndProvider, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { ControllerType } from '@/configs/constant.config';
-import { fetchTemplateList, fetchDiaryDetail, fetchTemplateContent } from './service';
+import { fetchTemplateList, fetchDiaryDetail, fetchTemplateContent, fetchTemplateDetail } from './service';
 import { ContentProps, TodoItemProps, ControllerProps, CostomModulesProps } from './types';
 import AddTodoItems from './AddTodoItems';
 import TodoItems from './TodoItems';
@@ -49,6 +49,7 @@ function getController(type: string, options?: ControllerProps = {}) {
 
 
 function DiaryModify(props) {
+  console.log(props);
   const { form } = props;
   const [templateList, seteTemplateList] = useState([]);
   const [addTodoItemVisible, setAddTodoItemVisible] = useState(false);
@@ -57,23 +58,32 @@ function DiaryModify(props) {
   const onEditorChange = (editorState: any) => setEditorState(editorState);
 
   useEffect(() => {
+    const { match: { params } } = props;
     fetchTemplateList()
       .then(({ data = [] }: { data: Array<{ name: string, id: string|number }> }) => {
         seteTemplateList(data);
       });
 
-    fetchDiaryDetail()
-      .then(({ data = {} }: { data: ContentProps }) => {
-        setContent(data);
-      });
-    return () => {
-    };
-  }, [])
+    if (params.diaryId) {
+      fetchDiaryDetail()
+        .then(({ data = {} }: { data: ContentProps }) => {
+          setContent(data);
+        });
+    } else if (params.tempalteId) {
+      fetchTemplateDetail()
+        .then(({ data = {} }: { data: ContentProps }) => {
+          setContent(data);
+        });
+    }
+  }, []);
 
   const handleChooseTemplate = (id: string|number) => {
     Modal.confirm({
+      icon: <></>,
       title: '要想清楚哦',
       content: '选择模块后，当日内容将重置',
+      okText: '确定',
+      cancelText: '取消',
       onOk: () => {
         fetchTemplateContent({ id })
           .then(({ data = {}}: { data: ContentProps }) => {
@@ -87,10 +97,16 @@ function DiaryModify(props) {
     setAddTodoItemVisible(true);
   };
 
+  const handleAddTotoItemClose = (selectedItem = content.todoList) => {
+    setAddTodoItemVisible(false);
+    console.log(selectedItem, { ...content, todoList: selectedItem })
+    setContent({ ...content, todoList: selectedItem });
+  }
+
   return (
   // <DndProvider backend={HTML5Backend}>
     <div className="cb-panel">
-    <Card>
+    <Card title="可选模板">
       {templateList.map(
         ({ id, name }) =>
           <Button
@@ -110,7 +126,7 @@ function DiaryModify(props) {
         header={
           <>
             今日计划
-            <Button style={{ marginLeft: 20 }} icon="plus-circle" onClick={handleAddItem}>新增ITEM</Button>
+            <Button type="link" style={{ marginLeft: 20 }} onClick={handleAddItem}>编辑items</Button>
           </>
         }
         key="1">
@@ -146,7 +162,7 @@ function DiaryModify(props) {
       )
     }
     </Collapse>
-    {addTodoItemVisible && <AddTodoItems selectedItems={content.todoList} /> }
+    {addTodoItemVisible && <AddTodoItems onClose={handleAddTotoItemClose} selectedItems={content.todoList} /> }
     </div>
   // </DndProvider>
   )

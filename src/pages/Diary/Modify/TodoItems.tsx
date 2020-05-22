@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Form, List, Input, Checkbox } from 'antd';
+import { Form, List, Input, Checkbox, Col } from 'antd';
 import { DndProvider, DragSource, DropTarget, useDrag } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { TodoItemProps } from './types';
 
+const todolistFormLayout = {
+  labelCol: { span: 4 },
+  wrapperCol: { span: 20 },
+};
+
 let dragingIndex = -1;
 const rowSource = {
-  beginDrag(props) {
+  beginDrag(props: any) {
     dragingIndex = props.index;
     return {
       index: props.index,
@@ -15,37 +20,29 @@ const rowSource = {
 };
 
 const rowTarget = {
-  drop(props, monitor) {
+  drop(props: any, monitor: any) {
+    console.log(props)
     const dragIndex = monitor.getItem().index;
     const hoverIndex = props.index;
 
-    // Don't replace items with themselves
     if (dragIndex === hoverIndex) {
       return;
     }
 
-    // Time to actually perform the action
     props.moveRow(dragIndex, hoverIndex);
 
-    // Note: we're mutating the monitor item here!
-    // Generally it's better to avoid mutations,
-    // but it's good here for the sake of performance
-    // to avoid expensive index searches.
     monitor.getItem().index = hoverIndex;
   },
 };
 
-function TodoItem(props) {
-
+function TodoItem(props: any) {
   const { item, index, form, isOver, connectDragSource, connectDropTarget, moveRow, ...restProps } = props;
-  const handleCompleted = (id: string|number) => {
-
-  };
-  const todolistFormLayout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
-  };
+  const [completed, setCompleted] = useState(item.completed);
   const style = { ...restProps.style, cursor: 'move' };
+
+  const handleCompleted = (value: boolean) => {
+    setCompleted(value);
+  };
 
   let { className } = restProps;
   if (isOver) {
@@ -78,23 +75,29 @@ function TodoItem(props) {
   // </div>
 
   return (
-    connectDropTarget(
-      <div style={style} className={className}>
-      <List.Item>
-        <Form.Item>
-          <Checkbox onClick={() => handleCompleted(item.id)} defaultChecked={item.completed}>
-            {item.name}
-          </Checkbox>
-        </Form.Item>
-        <Form.Item label="备注" {...todolistFormLayout}>
-          {
-            form.getFieldDecorator(`todoList__${index}__remark`, {
-              initialValue: item.remark,
-            })(<Input placeholder="请输入备注" />)
-          }
-        </Form.Item>
-      </List.Item >
-      </div>
+    connectDragSource(
+      connectDropTarget(
+        <div style={style} className={className}>
+        <List.Item>
+          <Col span={6}>
+            <Form.Item>
+              <Checkbox onChange={e => handleCompleted(e.target.checked)} defaultChecked={completed}>
+                <span style={{ textDecoration: completed ? 'line-though' : 'none' }}>{item.name}</span>
+              </Checkbox>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="备注" {...todolistFormLayout}>
+              {
+                form.getFieldDecorator(`todoList__${index}__remark`, {
+                  initialValue: item.remark,
+                })(<Input.TextArea rows={1} placeholder="请输入备注" style={{ width: '100%' }} />)
+              }
+            </Form.Item>
+          </Col>
+        </List.Item >
+        </div>
+      )
     )
   )
 }
@@ -108,15 +111,23 @@ const DropItem = DropTarget('row', rowTarget, (connect, monitor) => ({
   }))(TodoItem),
 );
 
-export default function TodoItemList(props) {
+export default function TodoItemList(props: any) {
   const { todoList, form } = props;
+  const [list, setList] = useState(todoList);
+
+  const moveRow = (dragIndex: number, hoverIndex: number) => {
+    const dragRow = todoList[dragIndex];
+    setList(list.splice(dragIndex, 1).splice(hoverIndex, 0, dragRow));
+  };
+  //  排序未生效，list, setList问题，带排查
   return (
     <DndProvider backend={HTML5Backend}>
       <List
+        // dataSource={list}
         dataSource={todoList}
         renderItem={
           (item: TodoItemProps, index) =>
-            <DropItem item={item} index={index} form={form} />
+            <DropItem item={item} index={index} form={form} moveRow={moveRow} />
         }
       ></List>
     </DndProvider>

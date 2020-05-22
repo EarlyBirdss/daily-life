@@ -2,17 +2,21 @@ import { request } from '@/utils';
 import { HOST } from '@/configs/constant.config';
 
 export function fetchTemplateList() {
-  return request(HOST + '/fetchTemplateList');
+  return request(HOST + '/diary/fetchTemplateList');
 }
 
 export function fetchDiaryDetail(params?: any) {
-  return request(HOST + '/fetchDiaryDetail', {...params});
+  return request(HOST + '/diary/fetchDetail', {...params});
+}
+
+export function fetchTemplateDetail(params?: any) {
+  return request(HOST + '/diary/fetchDetail', {...params});
 }
 
 export function fetchTemplateContent(params?: any) {
-  return request(HOST + '/fetchTemplateContent', {...params});
+  return request(HOST + '/diary/fetchTemplateContent', {...params});
 }
 
 export function fetchModulesById(params: { id: string|number }) {
-  return request(HOST + '/fetchModulesById', {...params});
+  return request(HOST + '/diary/fetchModulesById', {...params});
 }

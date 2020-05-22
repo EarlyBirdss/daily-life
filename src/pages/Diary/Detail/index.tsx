@@ -16,7 +16,7 @@ export default function DiaryDetail(props){
   return (
     <>
       <Affix offsetTop={40} onChange={affixed => console.log(affixed)}>
-        <Button href={`/#/diary/modify/${id}`}>修改日志</Button>
+        <Button href={`/#/diary/detail/modify/${id}`}>修改日志</Button>
       </Affix>
       <Card title="今日计划" style={{ marginTop: 10 }}>
         <List
@@ -32,7 +32,7 @@ export default function DiaryDetail(props){
         </List>
       </Card>
       {
-        (content.customModules || []).map((item: CostomModulesProps, index) => (
+        (content.customModules || []).map((item: CostomModulesProps) => (
             <Card title={item.name} style={{ marginTop:20 }} key={item.id}>
               {
                 item.children && item.children.length ?

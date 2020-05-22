@@ -18,16 +18,23 @@ const ButtonWrapper = styled.div`
   margin-top: 10px;
   text-align: right;
 `
+const formLayout = {
+  labelCol: { span: 4 },
+  wrapperCol: { span: 20 },
+};
 
 function formatSelectedItems(data: Array<TodoItemProps>, selectedItems: Array<TodoItemProps>) {
   const selectIds = selectedItems.map(({ id }) => id);
-  return data.map(item =>
-    selectIds.includes(item.id) ? {...item, selected: true} : {...item, selected: false}
-  );
+  const initialItems = selectedItems.map(item => ({ ...item, selected: true }));
+  const extraItems = data
+    .filter(({ id }) => !selectIds.includes(id))
+    .map(item => ({ ...item, selected: false, completed: false }));
+
+  return [...initialItems, ...extraItems];
 }
 
 function AddTodoItems(props: AddTodoItemProps){
-  const { selectedItems = [], form } = props;
+  const { selectedItems = [], form, onClose = function() {} } = props;
   const [todoItems, setTodoItems] = useState([]);
   const [newItems, setNewItems] = useState([{}]);
 
@@ -39,16 +46,36 @@ function AddTodoItems(props: AddTodoItemProps){
       })
   }, []);
 
-  // TODO: dom未更新
   const handleAddInput = () => {
-    newItems.push({id: newItems.length});
-    setNewItems(newItems);
+    const item = [...newItems, { id: newItems.length }];
+    setNewItems(item);
   };
 
   const handleRemoveInput = (index: number) => {
     newItems.splice(index, 1);
     setNewItems(newItems);
   }
+
+  const handleItemSelected = (value: boolean, id: number) => {
+    const items = todoItems.map(item => item.id === id ? {...item, selected: value} : item);
+    setTodoItems(items);
+  }
+
+  const handleSave = () => {
+    form.validateFields((err: any, values: any) => {
+      if (!err) {
+        const seletedTodoItems = todoItems.filter(({ selected }) => selected);
+        const newItems = Object.keys(values)
+          .filter(key => values[key])
+          .map(key => ({ id: +key, name: values[key], completed: false }));
+        onClose([...seletedTodoItems, ...newItems]);
+      }
+    });
+  };
+
+  const handleCancel = () => {
+    onClose();
+  };
   return (
     <Drawer
       visible={true}
@@ -60,7 +87,7 @@ function AddTodoItems(props: AddTodoItemProps){
         renderItem={
           ({ id, name, selected }) =>
             <List.Item>
-              <Checkbox defaultChecked={selected} disabled={selected} key={id}>
+              <Checkbox defaultChecked={selected} key={id} onChange={e => handleItemSelected(e.target.checked, id)}>
                 { name }
               </Checkbox>
             </List.Item>
@@ -69,9 +96,9 @@ function AddTodoItems(props: AddTodoItemProps){
       <FormWrapper>
         {
           newItems.map((item, index) =>
-            <Form.Item key={index}>
+            <Form.Item key={index} label={`新增项${index+1}`} {...formLayout}>
               {
-                form.getFieldDecorator(`newItem__${index}`, {
+                form.getFieldDecorator(`${index+1}`, {
                   rules: []
                 })(<Input
                     placeholder="请输入待完成项名称"
@@ -87,8 +114,8 @@ function AddTodoItems(props: AddTodoItemProps){
           )
         }
         <ButtonWrapper>
-          <Button type="primary" icon="save" style={{ marginRight: 10 }}>确认</Button>
-          <Button icon="close-square">取消</Button>
+          <Button type="primary" icon="save" onClick={handleSave} style={{ marginRight: 10 }}>确认</Button>
+          <Button icon="close-square" onClick={handleCancel}>取消</Button>
         </ButtonWrapper>
       </FormWrapper>
     </Drawer>

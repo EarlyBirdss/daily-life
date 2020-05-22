@@ -15,10 +15,12 @@ import {
   InputNumber,
   Checkbox,
   Popover,
+  Popconfirm,
   message,
+  Modal,
 } from 'antd';
-import { columns } from './options';
-import { fetchDiaryList, fetchModuleList } from './service';
+import { columns, logColumns } from './options';
+import { fetchDiaryList, fetchModuleList, fetchLogList } from './service';
 
 const { Option } = Select;
 
@@ -67,7 +69,7 @@ const QueryForm = (props: QueryFormProps) => {
           {getFieldDecorator('dateRange')(<DatePicker.RangePicker />)}
         </Form.Item>
         <Form.Item label="当前第N天">
-          {getFieldDecorator('day')(<InputNumber placeholder="请输入" />)}
+          {getFieldDecorator('day')(<InputNumber placeholder="请输入" min={0} />)}
         </Form.Item>
         <Form.Item label="模块">
           {getFieldDecorator('module')(
@@ -127,14 +129,35 @@ const DataTable = (props: DataTableProps) => {
     dataIndex: '_',
     title: '操作',
     fixed: 'right',
-    width: 200,
+    width: 300,
     render: (_, { id }: { id: number }) => (
       <>
-        <Button type="link" href="/#/diary/detail" style={{ padding: 0, marginRight: 8 }}>查看</Button>
-        <Button type="link" href={`/diary/modify/${id}`} style={{ padding: 0, marginRight: 8 }}>修改</Button>
-        <Button type="link" style={{ padding: 0 }}>查看修改日志</Button>
+        <a href="/#/diary/detail/view">查看</a>
+        <Divider type="vertical" />
+        <a href={`#/diary/detail/modify/${id}`}>修改</a>
+        <Divider type="vertical" />
+        <Popconfirm title="确定删除该条日志吗？" onConfirm={() => hanldeDelete(id)}>
+          <a>删除</a>
+        </Popconfirm>
+        <Divider type="vertical" />
+        <a onClick={() => handleLogModal(id)}>查看修改记录</a>
       </>
     )
+  };
+  const hanldeDelete = (id: number) => {
+
+  };
+  const handleLogModal = (id: number) => {
+    fetchLogList({ id }).then(( { data } : { data: Array<any> } ) => {
+      const content = <Table columns={logColumns} dataSource={data} pagination={false} bordered={true} />;
+      Modal.info({
+        title: '修改记录',
+        content,
+        okText: '确定',
+        width: 760,
+        icon: <></>,
+      });
+    });
   };
   const handleFilterChange = (values: Array<string>) => {
     newColumn = newColumn.filter(({ dataIndex }) => values.includes(dataIndex));
@@ -155,18 +178,19 @@ const DataTable = (props: DataTableProps) => {
 
   return (
     <>
-      <Popover
-        placement="bottomRight"
-        trigger="click"
-        title="请选择展示项"
-        content={ <Checkbox.Group options={filters} defaultValue={filterDefaultValue} onChange={handleFilterChange}></Checkbox.Group> }
-      >
-        <Button
-          type="primary"
-          icon="filter"
-          style={{ margin: "10px 0", float: "right" }}
-        >筛选</Button>
-      </Popover>
+      <div style={{ margin: "10px 0", textAlign: 'right' }}>
+        <Button type="primary" icon="plus" href={`#/diary/detail/create`} style={{ marginRight: 8 }}>新建日志</Button>
+        <Popover
+          placement="bottomRight"
+          trigger="click"
+          title="请选择展示项"
+          content={ <Checkbox.Group options={filters} defaultValue={filterDefaultValue} onChange={handleFilterChange}></Checkbox.Group> }
+        >
+          <Button
+            icon="filter"
+          >筛选</Button>
+        </Popover>
+      </div>
       <Table
         dataSource={list}
         columns={[...finalColumn, operateColumn]}
