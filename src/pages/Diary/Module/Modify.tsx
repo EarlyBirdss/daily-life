@@ -23,7 +23,7 @@ function Modify(props: ModifyProps) {
   const handleSubmit = () => {
     validateFields((err: any, values: object) => {
       if (!err) {
-        updateModuleDetail(id ? { id, ...values } : { ...values }).then(() => onClose(true));
+        updateModuleDetail({ id, parentId, ...values }).then(() => onClose(true));
       }
     });
   };

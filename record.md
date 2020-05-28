@@ -10,7 +10,7 @@
 ### 搭建时
 * webpack官方文档很难啃，很难整理出，当前项目必须使用的loader集合，已经loader与loader之间的关联，得到的信息都是片段化的。
 
-### 分支：version/12.27-01.10
+### 迭代 version/12.27-01.10
 #### 迭代目标：
 * 完成前端框架完整配置，以确保下一个迭代开发页面功能时能够不受阻碍
 * 具体内容为
@@ -109,6 +109,7 @@ You may need an additional loader to handle the result of these loaders.
 1. 完成日志列表和日志详情的开发
 2. 完成模板配置页面开发
 
+### 迭代version/05.18-05.25
 
 #### version/05.18-05.25 迭代计划
 1. 熟悉之前的代码，回归开发
@@ -118,4 +119,10 @@ You may need an additional loader to handle the result of these loaders.
 1. 完成大多数功能
 2. 剩余： 1. “日志编辑”模块排序未调通 2. “日志编辑”定时保存以及点击“保存”按钮功能未开发 3. 由于使用mock对接接口，接口对接部分功能代码待检查
 3. 下一阶段目标：开发后端服务
-4.
+
+### 迭代version/05.25-06.01
+#### version/05.25-06.01迭代计划
+1. 配合服务端开发调整代码
+
+#### version/05.25-06.01迭代记录
+1. 增加包concurrently，使得package命令中可以执行多行命令;同时启动前端和服务端服务

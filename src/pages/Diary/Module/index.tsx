@@ -20,7 +20,7 @@ export default function DiaryModule() {
     setmodalConfig({ id, parentId });
   };
   const handleDelete = (id: number, parentId?: number) => {
-    deleteModule({ id }).then(() => fetchModuleList());
+    deleteModule({ id, parentId }).then(() => fetchModuleList());
   };
   const handleAddChild = (id: number) => {
     setmodalConfig({ id: null, parentId: id });
@@ -35,16 +35,16 @@ export default function DiaryModule() {
   const operateColumn = {
     dataIndex: 'opreate',
     title: '操作',
-    render: (_, { id, parentId } : { id: number, parentId?: number }) => <>
-      <a onClick={() => handleEdit(id, parentId)}>编辑</a>
+    render: (_: any, { _id, parentId } : { _id: number, parentId?: number }) => <>
+      <a onClick={() => handleEdit(_id, parentId)}>编辑</a>
       <Divider type="vertical" />
-      <Popconfirm text="确认删除该条模块吗？" onConfirm={() => handleDelete(id, parentId)}>
+      <Popconfirm title="确认删除该条模块吗？" onConfirm={() => handleDelete(_id, parentId)}>
         <a>删除</a>
       </Popconfirm>
       {
         !parentId && <>
           <Divider type="vertical" />
-          <a onClick={() => handleAddChild(id)}>新增子模块</a>
+          <a onClick={() => handleAddChild(_id)}>新增子模块</a>
           </>
       }
     </>
