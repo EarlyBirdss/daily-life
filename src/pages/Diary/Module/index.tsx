@@ -58,7 +58,7 @@ export default function DiaryModule() {
           columns={[...columns, operateColumn]}
           pagination={false}
           defaultExpandAllRows={true}
-          rowKey="id"
+          rowKey="_id"
           >
         </Table>
         { modalConfig.id !== undefined && <Modify {...modalConfig} onClose={handleModalClose} />}

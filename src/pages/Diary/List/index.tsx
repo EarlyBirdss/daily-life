@@ -130,7 +130,7 @@ const DataTable = (props: DataTableProps) => {
     title: '操作',
     fixed: 'right',
     width: 300,
-    render: (_, { id }: { id: number }) => (
+    render: (_: any, { id }: { id: number }) => (
       <>
         <a href="/#/diary/detail/view">查看</a>
         <Divider type="vertical" />
@@ -203,7 +203,7 @@ const DataTable = (props: DataTableProps) => {
           pageSizeOptions: ['7', '14', '30'],
           ...pagination
         }}
-        rowKey="id"
+        rowKey="_id"
         >
       </Table>
     </>
