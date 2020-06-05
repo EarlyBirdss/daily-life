@@ -17,6 +17,18 @@ export function fetchTemplateContent(params?: any) {
   return request(HOST + '/diary/fetchTemplateContent', {...params});
 }
 
-export function fetchModulesById(params: { id: string|number }) {
-  return request(HOST + '/diary/fetchModulesById', {...params});
+export function fetchTodoList() {
+  return request(HOST + '/diary/fetchTodoList');
+}
+
+export function fetchModule() {
+  return request(HOST + '/diary/fetchModule');
+}
+
+export function updateDiary(params: object) {
+  return request(HOST + '/diary/updateDiary', { ...params });
+}
+
+export function saveTemplate(params: object) {
+  return request(HOST + '/diary/saveTemplate', { ...params });
 }

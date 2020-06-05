@@ -37,3 +37,14 @@ export interface AddTodoItemProps {
   onClose: any,
 }
 
+export interface BasicModuleItem {
+  id: number,
+  name: string,
+}
+
+export interface AddModuleProps {
+  selectItems: Array<BasicModuleItem>,
+  form: any,
+  onclose: any,
+}
+

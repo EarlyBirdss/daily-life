@@ -13,9 +13,10 @@ function Modify(props: ModifyProps) {
   const { id, parentId, onClose = function(){}, form } = props;
   const { getFieldDecorator, validateFields } = form;
   const [detail, setDetail] = useState({});
+  console.log(id, parentId)
 
   useEffect(() => {
-    id && fetchModuleDetail({ id }).then(({ data }: { data: DetailProps }) => {
+    id && fetchModuleDetail({ id, parentId }).then(({ data }: { data: DetailProps }) => {
       setDetail(data);
     });
   }, []);

@@ -7,12 +7,16 @@ export const ControllerType = {
   INPUT: 'INPUT',
   TEXTAREA: 'TEXTAREA',
   EDITOR: 'EDITOR',
+  CHECKBOX: 'CHECKBOX',
   NONE: 'NONE',
+  // TODOLIST: 'TODOLIST',
 };
 
 export const ControllerTypes = [
   { id: ControllerType.INPUT, name: ControllerType.INPUT },
   { id: ControllerType.TEXTAREA, name: ControllerType.TEXTAREA },
   { id: ControllerType.EDITOR, name: ControllerType.EDITOR },
+  { id: ControllerType.CHECKBOX, name: ControllerType.CHECKBOX },
   { id: ControllerType.NONE, name: ControllerType.NONE },
+  // { id: ControllerType.TODOLIST, name: ControllerType.TODOLIST },
 ];

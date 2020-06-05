@@ -57,7 +57,7 @@ export default function DiaryModule() {
           dataSource={list}
           columns={[...columns, operateColumn]}
           pagination={false}
-          defaultExpandAllRows={true}
+          expandable={{ defaultExpandAllRows: true }}
           rowKey="_id"
           >
         </Table>

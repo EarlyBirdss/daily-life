@@ -3,9 +3,14 @@ import { FULL_DATE_FORMAT, PLACEHOLDER_LABEL } from '@/configs/constant.config';
 
 export const columns = [
   {
-    dataIndex: 'id',
-    title: '模块ID',
+    dataIndex: 'index',
+    title: '序号',
+    render: (_: any, data: any, index: number ) => index + 1
   },
+  // {
+  //   dataIndex: 'id',
+  //   title: '模块ID',
+  // },
   {
     dataIndex: 'name',
     title: '模块名称',
