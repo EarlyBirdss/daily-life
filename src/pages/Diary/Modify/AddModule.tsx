@@ -1,7 +1,7 @@
 import React,{ useState, useEffect } from 'react';
 import { Form, Drawer, Checkbox, List, Input, Button, Icon } from 'antd';
-import { fetchTodoList } from './service';
-import { TodoItemProps, AddTodoItemProps } from './types';
+import { fetchModule } from './service';
+import { BasicModuleItem, AddModuleProps } from './types';
 import styled from 'styled-components';
 
 // TODO: 找antd 好看的溢出滚动条
@@ -23,9 +23,9 @@ const formLayout = {
   wrapperCol: { span: 20 },
 };
 
-function formatSelectedItems(data: Array<TodoItemProps>, selectedItems: Array<TodoItemProps>) {
+function formatSelectedItems(data: Array<BasicModuleItem>, selectedItems: Array<BasicModuleItem>) {
   const selectIds = selectedItems.map(({ _id }) => _id);
-  const initialItems = selectedItems.map(item => ({ ...item, selected: true }));
+  const initialItems = selectedItems.map(item => ({ ...item, selected: true, disabled: true }));
   const extraItems = data
     .filter(({ _id }) => !selectIds.includes(_id))
     .map(item => ({ ...item, selected: false, completed: false }));
@@ -33,14 +33,14 @@ function formatSelectedItems(data: Array<TodoItemProps>, selectedItems: Array<To
   return [...initialItems, ...extraItems];
 }
 
-function AddTodoItems(props: AddTodoItemProps){
+function AddModule(props: AddModuleProps){
   const { selectedItems = [], form, onClose = function() {} } = props;
   const [todoItems, setTodoItems] = useState([]);
   const [newItems, setNewItems] = useState([{}]);
 
   useEffect(() => {
-    fetchTodoList()
-      .then(({ data = [] }: { data: Array<TodoItemProps>}) => {
+    fetchModule()
+      .then(({ data = [] }: { data: Array<BasicModuleItem>}) => {
         const formatItems = formatSelectedItems(data, selectedItems);
         setTodoItems(formatItems);
       })
@@ -85,9 +85,9 @@ function AddTodoItems(props: AddTodoItemProps){
         // style={{ maxHeight: '70vh', overflowY: 'scroll' }}
         dataSource={todoItems}
         renderItem={
-          ({ _id, name, selected }) =>
+          ({ _id, name, selected, disabled }) =>
             <List.Item>
-              <Checkbox defaultChecked={selected} key={_id} onChange={e => handleItemSelected(e.target.checked, _id)}>
+              <Checkbox defaultChecked={selected} key={_id} onChange={e => handleItemSelected(e.target.checked, _id)} disabled={disabled}>
                 { name }
               </Checkbox>
             </List.Item>
@@ -96,12 +96,12 @@ function AddTodoItems(props: AddTodoItemProps){
       <FormWrapper>
         {
           newItems.map((item, index) =>
-            <Form.Item key={index} label={`新增项${index+1}`} {...formLayout}>
+            <Form.Item key={index} label={`新增模块${index+1}`} {...formLayout}>
               {
                 form.getFieldDecorator(`${index+1}`, {
                   rules: []
                 })(<Input
-                    placeholder="请输入待完成项名称"
+                    placeholder="请输入模块名称"
                     addonAfter={
                       index === 0 ?
                         <Icon type="plus" onClick={handleAddInput} style={{ cursor: 'pointer' }}/>
@@ -122,4 +122,4 @@ function AddTodoItems(props: AddTodoItemProps){
   );
 }
 
-export default Form.create()(AddTodoItems);
+export default Form.create()(AddModule);

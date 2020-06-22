@@ -10,12 +10,12 @@ const formLayout = {
 };
 
 function Modify(props: ModifyProps) {
-  const { id, parentId, onClose = function(){}, form } = props;
+  const { _id, parentId, onClose = function(){}, form } = props;
   const { getFieldDecorator, validateFields } = form;
   const [detail, setDetail] = useState({});
 
   useEffect(() => {
-    id && fetchModuleDetail({ id }).then(({ data }: { data: DetailProps }) => {
+    _id && fetchModuleDetail({ _id, parentId }).then(({ data }: { data: DetailProps }) => {
       setDetail(data);
     });
   }, []);
@@ -23,14 +23,14 @@ function Modify(props: ModifyProps) {
   const handleSubmit = () => {
     validateFields((err: any, values: object) => {
       if (!err) {
-        updateModuleDetail(id ? { id, ...values } : { ...values }).then(() => onClose(true));
+        updateModuleDetail({ _id, parentId, ...values }).then(() => onClose(true));
       }
     });
   };
 
   return (
     <Modal
-      title={id ? '编辑模块' : '新增模块'}
+      title={_id ? '编辑模块' : '新增模块'}
       width={560}
       okText="确定"
       cancelText="取消"
@@ -56,7 +56,7 @@ function Modify(props: ModifyProps) {
                 { required: true, message: '请选择编辑框类型' }
               ]
             })(<Select placeholder="请选择编辑框类型" style={{ width: '100%' }}>
-              { ControllerTypes.map(({ id, name }: { id: string, name: string }) => <Select.Option value={id} key={id}>{name}</Select.Option>) }
+              { ControllerTypes.map(({ _id: id, name } : { _id: string, name: string }) => <Select.Option value={id} key={id}>{name}</Select.Option>) }
             </Select>)
           }
         </Form.Item>

@@ -60,7 +60,7 @@ function TodoItem(props: any) {
   // <div ref={drag}>
   //   <li style={style} className={`${className} ant-list-item`}>
   //     <Form.Item>
-  //       <Checkbox onClick={() => handleCompleted(item.id)} defaultChecked={item.completed}>
+  //       <Checkbox onClick={() => handleCompleted(item._id)} defaultChecked={item.completed}>
   //         {item.name}
   //       </Checkbox>
   //     </Form.Item>
@@ -81,15 +81,28 @@ function TodoItem(props: any) {
         <List.Item>
           <Col span={6}>
             <Form.Item>
-              <Checkbox onChange={e => handleCompleted(e.target.checked)} defaultChecked={completed}>
-                <span style={{ textDecoration: completed ? 'line-though' : 'none' }}>{item.name}</span>
-              </Checkbox>
+              {
+                form.getFieldDecorator(`todoList__${item._id}__completed`, {
+                  initialValue: item.completed,
+                  valuePropName: 'checked'
+                })(
+                <Checkbox onChange={e => handleCompleted(e.target.checked)}>
+                  <span style={{ textDecoration: completed ? 'line-though' : 'none' }}>{item.name}</span>
+                </Checkbox>
+              )}
             </Form.Item>
           </Col>
+          {/* 设置隐藏表单域，保存名称 */}
+          {
+            form.getFieldDecorator(`todoList__${item._id}__name`, {
+              initialValue: item.name,
+            })(
+            <input type="hidden" />
+          )}
           <Col span={8}>
             <Form.Item label="备注" {...todolistFormLayout}>
               {
-                form.getFieldDecorator(`todoList__${index}__remark`, {
+                form.getFieldDecorator(`todoList__${item._id}__remark`, {
                   initialValue: item.remark,
                 })(<Input.TextArea rows={1} placeholder="请输入备注" style={{ width: '100%' }} />)
               }

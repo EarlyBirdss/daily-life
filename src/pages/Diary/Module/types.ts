@@ -1,5 +1,5 @@
 export interface ModifyProps {
-  id: object|number,
+  _id: object|number,
   parentId?: number,
   onClose: any,
   form: any,

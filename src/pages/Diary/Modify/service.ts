@@ -6,17 +6,25 @@ export function fetchTemplateList() {
 }
 
 export function fetchDiaryDetail(params?: any) {
-  return request(HOST + '/diary/fetchDetail', {...params});
+  return request(HOST + '/diary/fetchDiary', { params });
 }
 
 export function fetchTemplateDetail(params?: any) {
-  return request(HOST + '/diary/fetchDetail', {...params});
+  return request(HOST + '/diary/fetchTemplateDetail', { params });
 }
 
-export function fetchTemplateContent(params?: any) {
-  return request(HOST + '/diary/fetchTemplateContent', {...params});
+export function fetchTodoList() {
+  return request(HOST + '/diary/fetchTodoList');
 }
 
-export function fetchModulesById(params: { id: string|number }) {
-  return request(HOST + '/diary/fetchModulesById', {...params});
+export function fetchModule() {
+  return request(HOST + '/diary/fetchModule');
+}
+
+export function saveDiary(params: object) {
+  return request(HOST + '/diary/saveDiary', { method: 'POST', params });
+}
+
+export function saveTemplate(params: object) {
+  return request(HOST + '/diary/saveTemplate', { method: 'POST', params });
 }

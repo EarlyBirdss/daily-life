@@ -16,35 +16,35 @@ export default function DiaryModule() {
     fetchModuleList();
   }, []);
 
-  const handleEdit = (id: number, parentId?: number) => {
-    setmodalConfig({ id, parentId });
+  const handleEdit = (_id: number, parentId?: number) => {
+    setmodalConfig({ _id, parentId });
   };
-  const handleDelete = (id: number, parentId?: number) => {
-    deleteModule({ id }).then(() => fetchModuleList());
+  const handleDelete = (_id: number, parentId?: number) => {
+    deleteModule({ _id, parentId }).then(() => fetchModuleList());
   };
-  const handleAddChild = (id: number) => {
-    setmodalConfig({ id: null, parentId: id });
+  const handleAddChild = (_id: number) => {
+    setmodalConfig({ _id: null, parentId: _id });
   };
   const handleCreate = () => {
-    setmodalConfig({ id: null });
+    setmodalConfig({ _id: null });
   };
   const handleModalClose = (isFresh: boolean) => {
-    setmodalConfig({ id: undefined });
+    setmodalConfig({ _id: undefined });
     isFresh && fetchModuleList();
   };
   const operateColumn = {
     dataIndex: 'opreate',
     title: '操作',
-    render: (_, { id, parentId } : { id: number, parentId?: number }) => <>
-      <a onClick={() => handleEdit(id, parentId)}>编辑</a>
+    render: (_: any, { _id, parentId } : { _id: number, parentId?: number }) => <>
+      <a onClick={() => handleEdit(_id, parentId)}>编辑</a>
       <Divider type="vertical" />
-      <Popconfirm text="确认删除该条模块吗？" onConfirm={() => handleDelete(id, parentId)}>
+      <Popconfirm title="确认删除该条模块吗？" onConfirm={() => handleDelete(_id, parentId)}>
         <a>删除</a>
       </Popconfirm>
       {
         !parentId && <>
           <Divider type="vertical" />
-          <a onClick={() => handleAddChild(id)}>新增子模块</a>
+          <a onClick={() => handleAddChild(_id)}>新增子模块</a>
           </>
       }
     </>
@@ -57,11 +57,11 @@ export default function DiaryModule() {
           dataSource={list}
           columns={[...columns, operateColumn]}
           pagination={false}
-          defaultExpandAllRows={true}
-          rowKey="id"
+          expandable={{ defaultExpandAllRows: true }}
+          rowKey="_id"
           >
         </Table>
-        { modalConfig.id !== undefined && <Modify {...modalConfig} onClose={handleModalClose} />}
+        { modalConfig._id !== undefined && <Modify {...modalConfig} onClose={handleModalClose} />}
       </Card>
     </>
   )

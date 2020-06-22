@@ -4,12 +4,12 @@ import { fetchDiaryDetail } from './service';
 import { ContentProps, TodoItemProps, CostomModulesProps } from './types';
 
 export default function DiaryDetail(props){
-  const [content, setContent] = useState({ todoList: [], customModules: [] });
+  const [content, setContent] = useState({ todoList: [], modules: [] });
   const id = 1;
   useEffect(() => {
     // TODO: get ID
     fetchDiaryDetail({ id: 1 })
-      .then(({ data = { todoList: [], customModules: [] } }: { data: ContentProps }) => {
+      .then(({ data = { todoList: [], modules: [] } }: { data: ContentProps }) => {
         setContent(data);
       });
   }, []);
@@ -32,7 +32,7 @@ export default function DiaryDetail(props){
         </List>
       </Card>
       {
-        (content.customModules || []).map((item: CostomModulesProps) => (
+        (content.modules || []).map((item: CostomModulesProps) => (
             <Card title={item.name} style={{ marginTop:20 }} key={item.id}>
               {
                 item.children && item.children.length ?
