@@ -60,7 +60,7 @@ function TodoItem(props: any) {
   // <div ref={drag}>
   //   <li style={style} className={`${className} ant-list-item`}>
   //     <Form.Item>
-  //       <Checkbox onClick={() => handleCompleted(item.id)} defaultChecked={item.completed}>
+  //       <Checkbox onClick={() => handleCompleted(item._id)} defaultChecked={item.completed}>
   //         {item.name}
   //       </Checkbox>
   //     </Form.Item>
@@ -84,6 +84,7 @@ function TodoItem(props: any) {
               {
                 form.getFieldDecorator(`todoList__${item._id}__completed`, {
                   initialValue: item.completed,
+                  valuePropName: 'checked'
                 })(
                 <Checkbox onChange={e => handleCompleted(e.target.checked)}>
                   <span style={{ textDecoration: completed ? 'line-though' : 'none' }}>{item.name}</span>

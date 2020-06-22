@@ -5,7 +5,7 @@ export function fetchModule(params?: {}) {
   return request(HOST + '/diary/fetchModule', { data: params });
 }
 
-export function fetchModuleDetail(params: { id: number}) {
+export function fetchModuleDetail(params: { _id: number}) {
   return request(HOST + '/diary/fetchModuleDetail', { data: params });
 }
 

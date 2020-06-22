@@ -119,7 +119,7 @@ function createTemplateDetail() {
       { id: 10001, name: '06:30起床', completed: false, remark: '07:20' },
       { id: 10002, name: '阅读', completed: false, remark: '西窗小品' },
     ],
-    customModules: [
+    modules: [
       {
         id: 2,
         name: '饮食',
@@ -157,7 +157,7 @@ function createContent() {
       { id: 10001, name: '06:30起床', completed: false, remark: '07:20' },
       { id: 10002, name: '阅读', completed: true, remark: '西窗小品' },
     ],
-    customModules: [
+    modules: [
       {
         id: 2,
         name: '饮食',
@@ -191,7 +191,7 @@ function createTemplateContent() {
       { id: 10001, name: '06:30起床', completed: false, remark: '07:20' },
       { id: 10002, name: '阅读', completed: false, remark: '西窗小品' },
     ],
-    customModules: [
+    modules: [
       {
         id: 2,
         name: '饮食',
@@ -254,7 +254,7 @@ function createConfig() {
         modifyAt: '2019-12-22 10:10:11',
       },
     ],
-    customModules: [
+    modules: [
       {
         id: 1,
         name: ''

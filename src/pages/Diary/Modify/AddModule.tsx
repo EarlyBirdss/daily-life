@@ -24,10 +24,10 @@ const formLayout = {
 };
 
 function formatSelectedItems(data: Array<BasicModuleItem>, selectedItems: Array<BasicModuleItem>) {
-  const selectIds = selectedItems.map(({ id }) => id);
+  const selectIds = selectedItems.map(({ _id }) => _id);
   const initialItems = selectedItems.map(item => ({ ...item, selected: true, disabled: true }));
   const extraItems = data
-    .filter(({ id }) => !selectIds.includes(id))
+    .filter(({ _id }) => !selectIds.includes(_id))
     .map(item => ({ ...item, selected: false, completed: false }));
 
   return [...initialItems, ...extraItems];
@@ -47,7 +47,7 @@ function AddModule(props: AddModuleProps){
   }, []);
 
   const handleAddInput = () => {
-    const item = [...newItems, { id: newItems.length }];
+    const item = [...newItems, { _id: newItems.length }];
     setNewItems(item);
   };
 
@@ -56,8 +56,8 @@ function AddModule(props: AddModuleProps){
     setNewItems(newItems);
   }
 
-  const handleItemSelected = (value: boolean, id: number) => {
-    const items = todoItems.map(item => item.id === id ? {...item, selected: value} : item);
+  const handleItemSelected = (value: boolean, _id: number) => {
+    const items = todoItems.map(item => item._id === _id ? {...item, selected: value} : item);
     setTodoItems(items);
   }
 
@@ -67,7 +67,7 @@ function AddModule(props: AddModuleProps){
         const seletedTodoItems = todoItems.filter(({ selected }) => selected);
         const newItems = Object.keys(values)
           .filter(key => values[key])
-          .map(key => ({ id: +key, name: values[key], completed: false }));
+          .map(key => ({ _id: +key, name: values[key], completed: false }));
         onClose([...seletedTodoItems, ...newItems]);
       }
     });
@@ -85,9 +85,9 @@ function AddModule(props: AddModuleProps){
         // style={{ maxHeight: '70vh', overflowY: 'scroll' }}
         dataSource={todoItems}
         renderItem={
-          ({ id, name, selected, disabled }) =>
+          ({ _id, name, selected, disabled }) =>
             <List.Item>
-              <Checkbox defaultChecked={selected} key={id} onChange={e => handleItemSelected(e.target.checked, id)} disabled={disabled}>
+              <Checkbox defaultChecked={selected} key={_id} onChange={e => handleItemSelected(e.target.checked, _id)} disabled={disabled}>
                 { name }
               </Checkbox>
             </List.Item>

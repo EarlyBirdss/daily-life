@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Divider, Popconfirm } from 'antd';
-import { fetchTemplate, deleteTemplate } from './service';
+import { fetchTemplateList, deleteTemplate } from './service';
 import { colunms } from './options';
 import Modify from './Modify';
 
@@ -9,7 +9,7 @@ export default function DiaryTemplate() {
   const [modalConfig, setModalConfig] = useState({});
 
   function setTemplate() {
-    fetchTemplate()
+    fetchTemplateList()
       .then(({ data }: { data: Array<any>}) => setList(data));
   }
 
@@ -17,18 +17,18 @@ export default function DiaryTemplate() {
     setTemplate();
   }, []);
 
-  const handleDelete = (id: number) => {
-    deleteTemplate({ id }).then(() => {
+  const handleDelete = (_id: string) => {
+    deleteTemplate({ _id }).then(() => {
       setTemplate();
     });
   }
 
   const handleCreate = () => {
-    setModalConfig({ id: null });
+    setModalConfig({ _id: null });
   }
 
-  const handleEdit = (id: number) => {
-    setModalConfig({ id });
+  const handleEdit = (_id: string) => {
+    setModalConfig({ _id });
   }
 
   const handleModalClose = (isFresh: boolean) => {
@@ -39,12 +39,12 @@ export default function DiaryTemplate() {
   const operateColumn = {
     dataIndex: 'operate',
     title: '操作',
-    render: (_, { id }: { id: number }) => <>
-      <a onClick={() => handleEdit(id)}>编辑基础信息</a>
+    render: (_, { _id }: { _id: string }) => <>
+      <a onClick={() => handleEdit(_id)}>编辑基础信息</a>
       <Divider type="vertical" />
-      <a href={`#/diary/template/modify/${id}`}>编辑模板信息</a>
+      <a href={`#/diary/template/modify/${_id}`}>编辑模板信息</a>
       <Divider type="vertical" />
-      <Popconfirm text="确认删除该条模板吗？" onConfirm={() => handleDelete(id)}>
+      <Popconfirm title="确认删除该条模板吗？" onConfirm={() => handleDelete(_id)}>
         <a>删除</a>
       </Popconfirm>
     </>
@@ -60,7 +60,7 @@ export default function DiaryTemplate() {
           rowKey="id"
           >
         </Table>
-        { modalConfig.id !== undefined && <Modify {...modalConfig} onClose={handleModalClose} /> }
+        { modalConfig._id !== undefined && <Modify {...modalConfig} onClose={handleModalClose} /> }
       </Card>
     </>
   )

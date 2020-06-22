@@ -11,13 +11,15 @@ import {
   Row,
   Col,
   message,
-  Collapse
+  Collapse,
+  DatePicker,
 } from 'antd';
 import { Editor, EditorState } from 'draft-js';
 import { DndProvider, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import moment from 'moment';
 import { ControllerType } from '@/configs/constant.config';
-import { fetchTemplateList, fetchDiaryDetail, fetchTemplateContent, fetchTemplateDetail, updateDiary, saveTemplate } from './service';
+import { fetchTemplateList, fetchDiaryDetail, fetchTemplateContent, fetchTemplateDetail, saveDiary, saveTemplate } from './service';
 import { ContentProps, TodoItemProps, ControllerProps, CostomModulesProps } from './types';
 import AddTodoItems from './AddTodoItems';
 import TodoItems from './TodoItems';
@@ -54,28 +56,32 @@ function DiaryModify(props) {
   const [templateList, seteTemplateList] = useState([]);
   const [addTodoItemVisible, setAddTodoItemVisible] = useState(false);
   const [addModuleVisible, setAddModuleVisible] = useState(false);
-  const [content, setContent] = useState({ todoList: [], customModules: [] });
+  const [content, setContent] = useState({ todoList: [], modules: [] });
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [remarkVisible, setRemarkVisible] = useState(false);
   const [remark, setRemark] = useState('');
   const [templateVisible, setTemplateVisible] = useState(false);
   const [templateName, setTemplateName] = useState('');
+  const [templateDescription, setTemplateDescription] = useState('');
+  const [id, setId] = useState();
   const onEditorChange = (editorState: any) => setEditorState(editorState);
 
   useEffect(() => {
     const { match: { params } } = props;
     fetchTemplateList()
-      .then(({ data = [] }: { data: Array<{ name: string, id: string|number }> }) => {
+      .then(({ data = [] }: { data: Array<{ name: string, _id: string|number }> }) => {
         seteTemplateList(data);
       });
 
     if (params.diaryId) {
-      fetchDiaryDetail()
+      setId(params.diaryId);
+      fetchDiaryDetail({ _id: params.diaryId })
         .then(({ data = {} }: { data: ContentProps }) => {
           setContent(data);
         });
-    } else if (params.tempalteId) {
-      fetchTemplateDetail()
+    } else if (params.templateId) {
+      setId(params.templateId);
+      fetchTemplateDetail({ _id: params.templateId })
         .then(({ data = {} }: { data: ContentProps }) => {
           setContent(data);
         });
@@ -83,6 +89,7 @@ function DiaryModify(props) {
   }, []);
 
   useEffect(() => {
+    console.log(24445555)
     const timer = setInterval(() => {
       console.log(223)
       handleSumbit();
@@ -91,15 +98,15 @@ function DiaryModify(props) {
     return clearTimeout(timer);
   }, [])
 
-  const handleChooseTemplate = (id: string|number) => {
+  const handleChooseTemplate = (_id: string|number) => {
     Modal.confirm({
       icon: <></>,
-      title: '要想清楚哦',
+      title: '请确认',
       content: '选择模块后，当日内容将重置',
       okText: '确定',
       cancelText: '取消',
       onOk: () => {
-        fetchTemplateContent({ id })
+        fetchTemplateDetail({ _id })
           .then(({ data = {}}: { data: ContentProps }) => {
             setContent(data);
           });
@@ -120,28 +127,27 @@ function DiaryModify(props) {
     setAddModuleVisible(true);
   };
 
-  const handleAddModuleClose = (selectModules = content.customModules) => {
+  const handleAddModuleClose = (selectModules = content.modules) => {
     setAddModuleVisible(false);
-    const customModules = selectModules.map((item: CostomModulesProps) => {
-      const existantModule = content.customModules.find(({ id }) => id === item.id);
+    const modules = selectModules.map((item: CostomModulesProps) => {
+      const existantModule = content.modules.find(({ _id }) => _id === item._id);
       if (existantModule) {
         return existantModule;
       } else {
         const children = !item.children ? [] : item.children.map(
-          ({ _id, name, controllerType, content = '' }) => ({ id: _id, name, controllerType, content })
+          ({ _id, name, controllerType, content = '' }) => ({ _id: _id, name, controllerType, content })
         );
-        return { id: item.id, name: item.name, controllerType: item.controllerType, content: '', children };
+        return { _id: item._id, name: item.name, controllerType: item.controllerType, content: '', children };
       }
     });
 
-    setContent({ ...content, customModules });
+    setContent({ ...content, modules });
   }
 
   const handleSumbit = () => {
     form.validateFields((err: any, values: any) => {
       const data = formatPostData(values);
-      console.log(data)
-      updateDiary({ remark, ...data })
+      saveDiary({ _id: id, remark, ...data })
         .then(() => {
           message.success('日志已更新');
           setRemark('');
@@ -150,39 +156,40 @@ function DiaryModify(props) {
   }
 
   const formatPostData = (data: any) => {
-    const customModules: any = {};
+    const modules: any = {};
     const todoList: any = {};
     Object.keys(data).forEach((key: string) => {
       const value = data[key];
-      const [container, id, subId, keyName] = key.split('__');
+      const [container, _id, subId, keyName] = key.split('__');
       if (container === 'todoList') {
         const fieldName = subId;
-        if (!todoList[id]) {
-          todoList[id] = {
-            [fieldName]: value
+        if (!todoList[_id]) {
+          todoList[_id] = {
+            [fieldName]: value,
+            _id,
           };
         } else {
-          todoList[id][fieldName] = value;
+          todoList[_id][fieldName] = value;
         }
-      } else if (container === 'customModules') {
-        // const content = data[[container, id, subId, 'content'].join('__')];
-        // const name = data[[container, id, subId, 'name'].join('__')];
-        if (!customModules[id]) {
+      } else if (container === 'modules') {
+        // const content = data[[container, _id, subId, 'content'].join('__')];
+        // const name = data[[container, _id, subId, 'name'].join('__')];
+        if (!modules[_id]) {
           if (subId === '0') {
-            customModules[id] = { id, [keyName]: value };
+            modules[_id] = { _id, [keyName]: value };
           } else {
             // TODO：父模块没有取到name
-            customModules[id] = { id, name: '', children: [{ id: subId, [keyName]: value }] };
+            modules[_id] = { _id, name: '', children: [{ _id: subId, [keyName]: value }] };
           }
         } else {
           if (subId === '0') {
-            customModules[id][keyName] = value;
+            modules[_id][keyName] = value;
           } else {
-            const child = customModules[id].children.find(({ id }: { id: string}) => subId === id);
+            const child = modules[_id].children.find(({ _id }: { _id: string}) => subId === _id);
             if (child) {
               child[keyName] = value;
             } else {
-              customModules[id].children.push({ id: subId, [keyName]: value });
+              modules[_id].children.push({ _id: subId, [keyName]: value });
             }
           }
         }
@@ -190,28 +197,30 @@ function DiaryModify(props) {
     });
 
     return {
+      date: new Date(data.date),
       todoList: Object.keys(todoList).map(key => todoList[key]),
-      customModules: Object.keys(customModules).map(key => customModules[key])
+      modules: Object.keys(modules).map(key => modules[key])
     };
   }
 
   const handleDeleteModule = (index: number, item: CostomModulesProps) => {
-    const { customModules = [] } = content;
+    const { modules = [] } = content;
     Modal.confirm({
       title: '请确认',
       content: '请确认将删除改模块及模块下所有内容？',
-      onOk: () => setContent({...content, customModules: customModules.filter(({ id }) => id !== item.id)}),
+      onOk: () => setContent({...content, modules: modules.filter(({ _id }) => _id !== item._id)}),
     });
   }
 
   const handleSaveTemplate = () => {
     form.validateFields((err: any, values: any) => {
       const data = formatPostData(values);
-      console.log(data)
-      saveTemplate({ templateName, ...data })
+      const templateBasicDetail = templateName ? { name: templateName, description: templateDescription } : {};
+      saveTemplate({ _id: id, ...templateBasicDetail, ...data })
         .then(() => {
-          message.success('日志已更新');
+          message.success('模板已保存');
           setTemplateName('');
+          setTemplateDescription('');
         });
     });
   }
@@ -219,15 +228,22 @@ function DiaryModify(props) {
   return (
   // <DndProvider backend={HTML5Backend}>
     <div className="cb-panel">
+    <Form.Item>
+      {
+        form.getFieldDecorator('date', {
+          initialValue: new moment(),
+        })(<DatePicker />)
+      }
+    </Form.Item>
     { !!templateList.length &&
       <Card title="可选模板">
         {templateList.map(
-          ({ id, name }) =>
+          ({ _id, name }) =>
             <Button
-              onClick={() => handleChooseTemplate(id)}
+              onClick={() => handleChooseTemplate(_id)}
               style={{ marginRight: 10 }}
               icon="rocket"
-              key={id}
+              key={_id}
             >{name}</Button>)
         }
       </Card>
@@ -250,44 +266,56 @@ function DiaryModify(props) {
       </Collapse.Panel>
       {
       // 可排序
-      (content.customModules || []).map((item: CostomModulesProps, index) =>
+      (content.modules || []).map((item: CostomModulesProps, index) =>
         <Collapse.Panel
           header={item.name}
-          key={item.id}
-          extra={<Button icon="trash" onClick={() => handleDeleteModule(index, item)} />}
+          key={item._id}
+          extra={<Icon type="delete" onClick={() => handleDeleteModule(index, item)} />}
           >
           {
-            item.children && item.children.length ?
+            !!item.children && !!item.children.length && (
               item.children.map((subItem: CostomModulesProps) =>
-                <Form.Item key={subItem.id} label={subItem.name}>
+                <Form.Item key={subItem._id} label={subItem.name}>
                   {
-                    form.getFieldDecorator(`customModules__${item.id}__${subItem.id}__content`, {
+                    form.getFieldDecorator(`modules__${item._id}__${subItem._id}__content`, {
                       initialValue: subItem.content
                     })(getController(subItem.controllerType, { editorState, onEditorChange }))
                   }
                   {
-                    form.getFieldDecorator(`customModules__${item.id}__${subItem.id}__name`, {
+                    form.getFieldDecorator(`modules__${item._id}__${subItem._id}__name`, {
                       initialValue: subItem.name,
+                    })(
+                    <input type="hidden" />
+                  )}
+                  {
+                    form.getFieldDecorator(`modules__${item._id}__${subItem._id}__controllerType`, {
+                      initialValue: subItem.controllerType,
                     })(
                     <input type="hidden" />
                   )}
                 </Form.Item>
                 )
-              :
-              <Form.Item>
+              )
+          }
+          <Form.Item>
                 {
-                  form.getFieldDecorator(`customModules__${item.id}__${0}__content`, {
+                  form.getFieldDecorator(`modules__${item._id}__${0}__content`, {
                     initialValue: item.content
                   })(getController(item.controllerType, { editorState, onEditorChange }))
                 }
                 {
-                  form.getFieldDecorator(`customModules__${item.id}__${0}__name`, {
+                  form.getFieldDecorator(`modules__${item._id}__${0}__name`, {
                     initialValue: item.name,
                   })(
                   <input type="hidden" />
                 )}
+                {
+                  form.getFieldDecorator(`modules__${item._id}__${0}__controllerType`, {
+                    initialValue: item.controllerType,
+                  })(
+                  <input type="hidden" />
+                )}
               </Form.Item>
-          }
         </Collapse.Panel>
       )
     }
@@ -295,9 +323,10 @@ function DiaryModify(props) {
     <div style={{ margin: '20px 0' }}>
       <Button onClick={() => setRemarkVisible(true)}>提交</Button>
       <Button onClick={() => setTemplateVisible(true)}>设为模板</Button>
+      <Button onClick={handleSaveTemplate}>保存模板</Button>
     </div>
     {addTodoItemVisible && <AddTodoItems onClose={handleAddTotoItemClose} selectedItems={content.todoList} /> }
-    {addModuleVisible && <AddModule selectedItems={content.customModules.map(({ id, name }) => ({ id, name }))} onClose={handleAddModuleClose}></AddModule>}
+    {addModuleVisible && <AddModule selectedItems={content.modules.map(({ _id, name }) => ({ _id, name }))} onClose={handleAddModuleClose}></AddModule>}
     <Modal
       title="请提交修改备注"
       visible={remarkVisible}
@@ -306,11 +335,12 @@ function DiaryModify(props) {
         <Input.TextArea rows={4} onBlur={e => setRemark(e.target.value)} />
     </Modal>
     <Modal
-      title="请输入模板名称"
+      title="请输入模板信息"
       visible={templateVisible}
       onOk={() => { setTemplateVisible(false); handleSaveTemplate(); }}
       onCancel={() => setTemplateVisible(false)}>
-        <Input onBlur={e => setTemplateName(e.target.value)} />
+      <Input onBlur={e => setTemplateName(e.target.value)} placeholder="请输入模板名称" />
+      <Input.TextArea onBlur={e => setTemplateDescription(e.target.value)} placeholder="请输入模板描述" style={{ marginTop: 15 }} />
     </Modal>
     </div>
   // </DndProvider>

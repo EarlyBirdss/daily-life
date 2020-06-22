@@ -16,20 +16,20 @@ export default function DiaryModule() {
     fetchModuleList();
   }, []);
 
-  const handleEdit = (id: number, parentId?: number) => {
-    setmodalConfig({ id, parentId });
+  const handleEdit = (_id: number, parentId?: number) => {
+    setmodalConfig({ _id, parentId });
   };
-  const handleDelete = (id: number, parentId?: number) => {
-    deleteModule({ id, parentId }).then(() => fetchModuleList());
+  const handleDelete = (_id: number, parentId?: number) => {
+    deleteModule({ _id, parentId }).then(() => fetchModuleList());
   };
-  const handleAddChild = (id: number) => {
-    setmodalConfig({ id: null, parentId: id });
+  const handleAddChild = (_id: number) => {
+    setmodalConfig({ _id: null, parentId: _id });
   };
   const handleCreate = () => {
-    setmodalConfig({ id: null });
+    setmodalConfig({ _id: null });
   };
   const handleModalClose = (isFresh: boolean) => {
-    setmodalConfig({ id: undefined });
+    setmodalConfig({ _id: undefined });
     isFresh && fetchModuleList();
   };
   const operateColumn = {
@@ -61,7 +61,7 @@ export default function DiaryModule() {
           rowKey="_id"
           >
         </Table>
-        { modalConfig.id !== undefined && <Modify {...modalConfig} onClose={handleModalClose} />}
+        { modalConfig._id !== undefined && <Modify {...modalConfig} onClose={handleModalClose} />}
       </Card>
     </>
   )

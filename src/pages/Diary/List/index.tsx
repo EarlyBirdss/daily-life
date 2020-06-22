@@ -19,8 +19,11 @@ import {
   message,
   Modal,
 } from 'antd';
+import moment from 'moment';
+import { ONLY_DATE_FORMAT } from '@/configs/constant.config';
 import { columns, logColumns } from './options';
-import { fetchDiaryList, fetchModuleList, fetchLogList } from './service';
+import { fetchDiaryList, fetchModuleList, fetchLogList, deleteDiary } from './service';
+import MarkModal from './MarkModal';
 
 const { Option } = Select;
 
@@ -33,12 +36,14 @@ const QueryForm = (props: QueryFormProps) => {
   const { getFieldDecorator } = form;
   const [moduleList, setModuleList] = useState([]);
   const [childModuleList, setChildModuleList] = useState([]);
+
   useEffect(() => {
     fetchModuleList()
       .then(({ data = [] }: { data: Array<{ id: string|number, name: string, children?:Array<any> }> }) => {
         setModuleList(data);
       });
   }, []);
+
   const handleModuleChange = (values: Array<string|number>) => {
     const modules = values.map(value => {
       const module = moduleList.find(({ id }) => id === value);
@@ -107,48 +112,61 @@ const QueryForm = (props: QueryFormProps) => {
 
 interface DataTableProps {
   list: Array<object>,
-  customsColumns: Array<{ id: string, name: string }>,
+  customsColumns: Array<{ _id: string, name: string }>,
   pagination: object,
   onSubmit: any,
-  form: { validateFields: any }
+  form: { validateFields: any },
+  refresh: any
 }
 const DataTable = (props: DataTableProps) => {
-  const { list, customsColumns, pagination, onSubmit, form } = props;
-  const formatedCustomsColumns = customsColumns.map(({ id, name }: { id: string, name: string }) => ({
-    dataIndex: `module_${id}`,
+  const { list, customsColumns, pagination, onSubmit, form, refresh } = props;
+  const [markModalProps, setMarkModalProps] = useState({});
+  const formatedCustomsColumns = customsColumns.map(({ _id, name }: { _id: string, name: string }) => ({
+    dataIndex: `module_${_id}`,
     title: name,
   }));
   const placeholderIndex = columns.findIndex(({ dataIndex }) => dataIndex === 'placeholder');
+
   let newColumn = [...columns];
   newColumn.splice(placeholderIndex, 0, ...formatedCustomsColumns);
   newColumn = newColumn.filter(({ dataIndex }) => dataIndex !== 'placeholder');
+
   const [finalColumn, setFinalColumn] = useState(newColumn);
   const filters = newColumn.map(({ dataIndex, title }) => ({ label: title, value: dataIndex }));
   const filterDefaultValue = filters.map(({ value }) => value);
+
   const operateColumn = {
     dataIndex: '_',
     title: '操作',
     fixed: 'right',
     width: 300,
-    render: (_: any, { id }: { id: number }) => (
+    render: (_: any, { _id, date }: { _id: string, date: Date }) => (
       <>
         <a href="/#/diary/detail/view">查看</a>
         <Divider type="vertical" />
-        <a href={`#/diary/detail/modify/${id}`}>修改</a>
+        <a href={`#/diary/detail/modify/${_id}`}>修改</a>
         <Divider type="vertical" />
-        <Popconfirm title="确定删除该条日志吗？" onConfirm={() => hanldeDelete(id)}>
+        <a onClick={() => markGrade(_id, { date } )}>打分</a>
+        <Divider type="vertical" />
+        <Popconfirm title="确定删除该条日志吗？" onConfirm={() => hanldeDelete(_id)}>
           <a>删除</a>
         </Popconfirm>
         <Divider type="vertical" />
-        <a onClick={() => handleLogModal(id)}>查看修改记录</a>
+        <a onClick={() => handleLogModal(_id)}>查看修改记录</a>
       </>
     )
   };
-  const hanldeDelete = (id: number) => {
 
+  const hanldeDelete = (_id: string) => {
+    deleteDiary({ _id })
+      .then(() => {
+        message.success('日志已删除');
+        refresh();
+      });
   };
-  const handleLogModal = (id: number) => {
-    fetchLogList({ id }).then(( { data } : { data: Array<any> } ) => {
+
+  const handleLogModal = (_id: string) => {
+    fetchLogList({ _id }).then(( { data } : { data: Array<any> } ) => {
       const content = <Table columns={logColumns} dataSource={data} pagination={false} bordered={true} />;
       Modal.info({
         title: '修改记录',
@@ -159,10 +177,20 @@ const DataTable = (props: DataTableProps) => {
       });
     });
   };
+
+  const markGrade = (_id: string, { date }: { date: Date }) => {
+    setMarkModalProps({
+      _id,
+      dateString: moment(date).format(ONLY_DATE_FORMAT),
+      onClose: refresh
+    });
+  };
+
   const handleFilterChange = (values: Array<string>) => {
     newColumn = newColumn.filter(({ dataIndex }) => values.includes(dataIndex));
     setFinalColumn(newColumn);
   };
+
   const handleTableChange = (pagination: any, filters: any, sorter: any) => {
     const { field, order } = sorter;
     form.validateFields((err: any, value: any) => {
@@ -206,6 +234,7 @@ const DataTable = (props: DataTableProps) => {
         rowKey="_id"
         >
       </Table>
+      <MarkModal {...markModalProps} />
     </>
   )
 }
@@ -241,6 +270,7 @@ const ReportPanel = (props: ReportPanelProps) => {
 //   sortFiled?: string,
 //   sortOrder?: string,
 // }
+
 function Diary(props: any) {
   const { form } = props;
   const [listConfig, setListConfig] = useState({ list: [], pagination: {}, customsColumns: [] });
@@ -262,7 +292,7 @@ function Diary(props: any) {
   return (
     <>
       <QueryForm {...props} onSubmit={onQueryFormSubmit} />
-      <DataTable {...listConfig} form={form} onSubmit={onQueryFormSubmit} />
+      <DataTable {...listConfig} form={form} onSubmit={onQueryFormSubmit} refresh={onQueryFormSubmit} />
       <ReportPanel reportList={reportList} />
     </>
   );

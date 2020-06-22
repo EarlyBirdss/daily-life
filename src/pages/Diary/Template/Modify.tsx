@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select  } from 'antd';
-import { fetchTemplateBasicDetail, updateTemplateBasicDetail } from './service';
+import { fetchTemplateBasicDetail, saveTemplateBasicDetail } from './service';
 import { ModifyProps, DetailProps } from './types';
 
 const formLayout = {
@@ -9,12 +9,12 @@ const formLayout = {
 };
 
 function Modify(props: ModifyProps) {
-  const { id, onClose = function(){}, form } = props;
+  const { _id, onClose = function(){}, form } = props;
   const { getFieldDecorator, validateFields } = form;
   const [detail, setDetail] = useState({});
 
   useEffect(() => {
-    id && fetchTemplateBasicDetail({ id }).then(({ data }: { data: DetailProps }) => {
+    _id && fetchTemplateBasicDetail({ _id }).then(({ data }: { data: DetailProps }) => {
       setDetail(data);
     });
   }, []);
@@ -22,14 +22,14 @@ function Modify(props: ModifyProps) {
   const handleSubmit = () => {
     validateFields((err: any, values: object) => {
       if (!err) {
-        updateTemplateBasicDetail(id ? { id, ...values } : { ...values }).then(() => onClose(true));
+        saveTemplateBasicDetail(_id ? { _id, ...values } : { ...values }).then(() => onClose(true));
       }
     });
   };
 
   return (
     <Modal
-      title={id ? '编辑模板' : '新增模板'}
+      title={_id ? '编辑模板' : '新增模板'}
       width={560}
       okText="确定"
       cancelText="取消"
@@ -52,7 +52,7 @@ function Modify(props: ModifyProps) {
             getFieldDecorator('description', {
               initialValue: detail.description,
               rules: [
-                { required: true, message: '请输入模板描述' }
+                // { required: true, message: '请输入模板描述' }
               ]
             })(<Input.TextArea placeholder="请输入模板描述" />)
           }

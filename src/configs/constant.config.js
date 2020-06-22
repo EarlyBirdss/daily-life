@@ -1,6 +1,7 @@
 export const HOST = 'http://127.0.0.1:8082';
 
 export const FULL_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+export const ONLY_DATE_FORMAT = 'YYYY-MM-DD';
 export const PLACEHOLDER_LABEL = '--';
 
 export const ControllerType = {

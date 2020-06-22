@@ -6,15 +6,11 @@ export function fetchTemplateList() {
 }
 
 export function fetchDiaryDetail(params?: any) {
-  return request(HOST + '/diary/fetchDetail', {...params});
+  return request(HOST + '/diary/fetchDiary', { params });
 }
 
 export function fetchTemplateDetail(params?: any) {
-  return request(HOST + '/diary/fetchDetail', {...params});
-}
-
-export function fetchTemplateContent(params?: any) {
-  return request(HOST + '/diary/fetchTemplateContent', {...params});
+  return request(HOST + '/diary/fetchTemplateDetail', { params });
 }
 
 export function fetchTodoList() {
@@ -25,10 +21,10 @@ export function fetchModule() {
   return request(HOST + '/diary/fetchModule');
 }
 
-export function updateDiary(params: object) {
-  return request(HOST + '/diary/updateDiary', { ...params });
+export function saveDiary(params: object) {
+  return request(HOST + '/diary/saveDiary', { method: 'POST', params });
 }
 
 export function saveTemplate(params: object) {
-  return request(HOST + '/diary/saveTemplate', { ...params });
+  return request(HOST + '/diary/saveTemplate', { method: 'POST', params });
 }

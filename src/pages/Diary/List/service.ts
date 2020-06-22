@@ -12,3 +12,11 @@ export function fetchModuleList() {
 export function fetchLogList(params: object) {
   return request(HOST + '/diary/fetchLogList', {...params});
 }
+
+export function markGrade(params: object) {
+  return request(HOST + '/diary/markGrade', { method: 'POST', params });
+}
+
+export function deleteDiary(params: object) {
+  return request(HOST + '/diary/deleteDiary', { method: 'DELETE', params });
+}

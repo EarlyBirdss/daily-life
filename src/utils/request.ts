@@ -39,7 +39,10 @@ export default function request(url: string, options?: any, config = { showTip: 
     .then(res => res.json())
     .then(res => {
       const { success, tip } = res;
-      success === false && message.error(tip);
+      if (success === false) {
+        message.error(tip);
+        return Promise.reject(res);
+      }
       config.showTip === true && message[config.tipType](tip);
       return res;
     });
