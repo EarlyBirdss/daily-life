@@ -56,7 +56,10 @@ function Modify(props: ModifyProps) {
                 { required: true, message: '请选择编辑框类型' }
               ]
             })(<Select placeholder="请选择编辑框类型" style={{ width: '100%' }}>
-              { ControllerTypes.map(({ _id: id, name } : { _id: string, name: string }) => <Select.Option value={id} key={id}>{name}</Select.Option>) }
+              {
+                ControllerTypes.map(({ id, name } : { id: string, name: string }) =>
+                  <Select.Option value={id} key={id}>{name}</Select.Option>)
+              }
             </Select>)
           }
         </Form.Item>

@@ -20,7 +20,7 @@ import {
   Modal,
 } from 'antd';
 import moment from 'moment';
-import { ONLY_DATE_FORMAT } from '@/configs/constant.config';
+import { ONLY_DATE_FORMAT, PLACEHOLDER_LABEL } from '@/configs/constant.config';
 import { columns, logColumns } from './options';
 import { fetchDiaryList, fetchModuleList, fetchLogList, deleteDiary } from './service';
 import MarkModal from './MarkModal';
@@ -44,10 +44,10 @@ const QueryForm = (props: QueryFormProps) => {
       });
   }, []);
 
-  const handleModuleChange = (values: Array<string|number>) => {
-    const modules = values.map(value => {
-      const module = moduleList.find(({ id }) => id === value);
-      return module.children || [];
+  const handleModuleChange = (values: Array<{ label: string, key: string }>) => {
+    const modules = values.map(({ key }) => {
+      const module: any = moduleList.find(({ _id }) => _id === key) || {};
+      return module.children.map((item: any) => ({ parentId: module._id, ...item })) || [];
     });
 
     setChildModuleList(modules.reduce((a: Array<any>, b: Array<any>) => [...a, ...b], []));
@@ -56,7 +56,7 @@ const QueryForm = (props: QueryFormProps) => {
     e.preventDefault();
     form.validateFields((err: any, value: any) => {
       if (!err) {
-        onSubmit({...value});
+        onSubmit({ ...value, modules: JSON.stringify(value.modules), childModules: JSON.stringify(value.childModules) });
       } else {
         onSubmit({});
       }
@@ -77,21 +77,32 @@ const QueryForm = (props: QueryFormProps) => {
           {getFieldDecorator('day')(<InputNumber placeholder="请输入" min={0} />)}
         </Form.Item>
         <Form.Item label="模块">
-          {getFieldDecorator('module')(
-            <Select placeholder="请选择" onChange={handleModuleChange} mode="multiple" allowClear={true} style={{ minWidth: 140 }}>
+          {getFieldDecorator('modules')(
+            <Select
+              placeholder="请选择"
+              onChange={handleModuleChange}
+              mode="multiple"
+              allowClear={true}
+              style={{ minWidth: 140 }}
+              labelInValue={true} >
               {
-                moduleList.map(({ id, name }) =>
-                  <Option key={id} value={id}>{name}</Option>)
+                moduleList.map(({ _id, name }) =>
+                  <Option key={_id} value={_id}>{name}</Option>)
               }
             </Select>)}
         </Form.Item>
         { !!childModuleList.length &&
             <Form.Item>
-              {getFieldDecorator('childModule')(
-                <Select placeholder="请选择" mode="multiple" allowClear={true} style={{ minWidth: 140 }}>
+              {getFieldDecorator('childModules')(
+                <Select
+                  placeholder="请选择"
+                  mode="multiple"
+                  allowClear={true}
+                  style={{ minWidth: 140 }}
+                  labelInValue={true} >
                   {
-                    childModuleList.map(({ id, name }) =>
-                      <Option key={id} value={id}>{name}</Option>)
+                    childModuleList.map(({ _id, name, parentId }) =>
+                      <Option key={_id} value={`${_id}__${parentId}`}>{name}</Option>)
                   }
                 </Select>)}
             </Form.Item>
@@ -110,9 +121,23 @@ const QueryForm = (props: QueryFormProps) => {
   )
 };
 
+interface CustomsColumn {
+  key: string,
+  label: string,
+  id: string,
+  parentId: string
+}
+
+interface moduleItem {
+  _id: string,
+  name: string,
+  children?: Array<any>,
+  completed?: boolean
+}
+
 interface DataTableProps {
   list: Array<object>,
-  customsColumns: Array<{ _id: string, name: string }>,
+  customsColumns: Array<CustomsColumn>,
   pagination: object,
   onSubmit: any,
   form: { validateFields: any },
@@ -121,17 +146,29 @@ interface DataTableProps {
 const DataTable = (props: DataTableProps) => {
   const { list, customsColumns, pagination, onSubmit, form, refresh } = props;
   const [markModalProps, setMarkModalProps] = useState({});
-  const formatedCustomsColumns = customsColumns.map(({ _id, name }: { _id: string, name: string }) => ({
-    dataIndex: `module_${_id}`,
-    title: name,
+  const formatedCustomsColumns = customsColumns.map(({ key, label, id, parentId }: CustomsColumn) => ({
+    dataIndex: `module_${key}`,
+    title: label,
+    render: (_: any, { todoList, modules }: any) => {
+      if (!parentId) {
+        return (modules.find(({ _id }: moduleItem) => _id === id) || {}).conent || PLACEHOLDER_LABEL;
+      } else {
+        const todoItem = todoList.find(({ _id }: moduleItem) => _id === id);
+        if (todoItem) {
+          return todoItem.completed === true ? '已完成': <Tag color="#f50">未完成</Tag>;
+        } else {
+          const module = (modules.find(({ _id }: moduleItem) => _id === parentId) || {}).content || PLACEHOLDER_LABEL;
+          return ((module.children || []).find(({ _id }: moduleItem) => _id === id) || {});
+        }
+      }
+    }
   }));
   const placeholderIndex = columns.findIndex(({ dataIndex }) => dataIndex === 'placeholder');
 
   let newColumn = [...columns];
-  newColumn.splice(placeholderIndex, 0, ...formatedCustomsColumns);
+  newColumn.splice(placeholderIndex, 1, ...formatedCustomsColumns);
   newColumn = newColumn.filter(({ dataIndex }) => dataIndex !== 'placeholder');
-
-  const [finalColumn, setFinalColumn] = useState(newColumn);
+  const [tableColumns, setTableColumns] = useState(newColumn);
   const filters = newColumn.map(({ dataIndex, title }) => ({ label: title, value: dataIndex }));
   const filterDefaultValue = filters.map(({ value }) => value);
 
@@ -142,8 +179,8 @@ const DataTable = (props: DataTableProps) => {
     width: 300,
     render: (_: any, { _id, date }: { _id: string, date: Date }) => (
       <>
-        <a href="/#/diary/detail/view">查看</a>
-        <Divider type="vertical" />
+        {/* <a href="/#/diary/detail/view">查看</a>
+        <Divider type="vertical" /> */}
         <a href={`#/diary/detail/modify/${_id}`}>修改</a>
         <Divider type="vertical" />
         <a onClick={() => markGrade(_id, { date } )}>打分</a>
@@ -188,7 +225,7 @@ const DataTable = (props: DataTableProps) => {
 
   const handleFilterChange = (values: Array<string>) => {
     newColumn = newColumn.filter(({ dataIndex }) => values.includes(dataIndex));
-    setFinalColumn(newColumn);
+    setTableColumns(newColumn);
   };
 
   const handleTableChange = (pagination: any, filters: any, sorter: any) => {
@@ -221,7 +258,7 @@ const DataTable = (props: DataTableProps) => {
       </div>
       <Table
         dataSource={list}
-        columns={[...finalColumn, operateColumn]}
+        columns={[...newColumn, operateColumn]}
         style={{ marginTop: 20 }}
         onChange={handleTableChange}
         pagination={{
@@ -239,16 +276,26 @@ const DataTable = (props: DataTableProps) => {
   )
 }
 interface ReportPanelProps {
-  reportList: Array<{ name: string, times: number }>
+  reportList: Array<any>
 }
 const ReportPanel = (props: ReportPanelProps) => {
   const { reportList } = props;
+  const todoList = reportList.reduce((a, b) => a.concat(b.todoList), []);
+  const todoMap: any = {};
+  todoList.forEach(({ name, completed }: moduleItem) => {
+    if (todoMap[name]) {
+      completed === true && ++(todoMap[name]);
+    } else {
+      todoMap[name] = completed === true ? 1 : 0;
+    }
+  });
+  const list = Object.keys(todoMap).map(name => ({ name, times: todoMap[name] })).sort((a, b) => a.times - b.times);
   return (
     <>
       <Divider orientation="left">结果统计</Divider>
       <List
         header={<div>今日计划</div>}
-        dataSource={reportList}
+        dataSource={list}
         bordered
         renderItem={item => (
           <List.Item>
@@ -264,8 +311,8 @@ const ReportPanel = (props: ReportPanelProps) => {
 // interface QueryFormParams {
 //   dateRange?: Array<string>,
 //   day?: number,
-//   module?: Array<string>,
-//   childModule?: Array<string>,
+//   modules?: Array<string>,
+//   childModules?: Array<string>,
 //   isCompleted?: Boolean,
 //   sortFiled?: string,
 //   sortOrder?: string,
@@ -274,7 +321,7 @@ const ReportPanel = (props: ReportPanelProps) => {
 function Diary(props: any) {
   const { form } = props;
   const [listConfig, setListConfig] = useState({ list: [], pagination: {}, customsColumns: [] });
-  const reportList = [{ name: '阅读', times: 14 }, { name: 'EF UNIT', times: 7 }];
+  // const reportList = [{ name: '阅读', times: 14 }, { name: 'EF UNIT', times: 7 }];
   useEffect(() => {
     fetchDiaryList({})
       .then(({ data = [] }: { data: Array<object> }) => {
@@ -293,7 +340,7 @@ function Diary(props: any) {
     <>
       <QueryForm {...props} onSubmit={onQueryFormSubmit} />
       <DataTable {...listConfig} form={form} onSubmit={onQueryFormSubmit} refresh={onQueryFormSubmit} />
-      <ReportPanel reportList={reportList} />
+      <ReportPanel reportList={listConfig.list} />
     </>
   );
 }

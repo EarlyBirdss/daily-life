@@ -3,6 +3,7 @@ import { Layout } from 'antd';
 import { connect } from 'dva';
 import SideMenu from './SideMenu';
 import Breadcrumb from './Breadcrumb';
+import LoginBar from './LoginBar';
 
 import './style.less';
 
@@ -18,7 +19,10 @@ export default function MainLayout(props: any) {
       <Layout>
         <Content style={{ padding: '20px 30px' }}>
           {/* TODO: 增加错误边界功能，防止页面崩溃影响体验 */}
-          <Breadcrumb props={[{ path: '/', label: '首页' }]}></Breadcrumb>
+          <div className="headbar">
+            <Breadcrumb props={[{ path: '/', label: '首页' }]}></Breadcrumb>
+            <LoginBar />
+          </div>
           <Layout className="main-content">{ props.children }</Layout>
         </Content>
       </Layout>

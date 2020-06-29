@@ -45,7 +45,8 @@ function getController(type: string, options?: ControllerProps = {}) {
       break;
     case ControllerType.EDITOR:
     default:
-      controller = <Editor editorState={editorState} onEditorChange={onEditorChange} {...restOptions} />;
+      // controller = <Editor editorState={editorState} onEditorChange={onEditorChange} {...restOptions} />;
+      controller = <Input.TextArea placeholder={placeholder} {...restOptions} />
       break;
   }
   return controller;
@@ -65,6 +66,7 @@ function DiaryModify(props) {
   const [templateDescription, setTemplateDescription] = useState('');
   const [id, setId] = useState();
   const onEditorChange = (editorState: any) => setEditorState(editorState);
+  let isTemplate = false;
 
   useEffect(() => {
     const { match: { params } } = props;
@@ -81,6 +83,7 @@ function DiaryModify(props) {
         });
     } else if (params.templateId) {
       setId(params.templateId);
+      isTemplate = true;
       fetchTemplateDetail({ _id: params.templateId })
         .then(({ data = {} }: { data: ContentProps }) => {
           setContent(data);
@@ -89,14 +92,12 @@ function DiaryModify(props) {
   }, []);
 
   useEffect(() => {
-    console.log(24445555)
     const timer = setInterval(() => {
-      console.log(223)
       handleSumbit();
     }, 2000);
 
     return clearTimeout(timer);
-  }, [])
+  }, []);
 
   const handleChooseTemplate = (_id: string|number) => {
     Modal.confirm({
@@ -228,13 +229,17 @@ function DiaryModify(props) {
   return (
   // <DndProvider backend={HTML5Backend}>
     <div className="cb-panel">
-    <Form.Item>
-      {
-        form.getFieldDecorator('date', {
-          initialValue: new moment(),
-        })(<DatePicker />)
-      }
-    </Form.Item>
+    {
+      !isTemplate && <Card title="日志日期" style={{ marginBottom: 15 }}>
+        <Form.Item style={{ marginBottom: 0 }}>
+          {
+            form.getFieldDecorator('date', {
+              initialValue: new moment(),
+            })(<DatePicker />)
+          }
+        </Form.Item>
+      </Card>
+    }
     { !!templateList.length &&
       <Card title="可选模板">
         {templateList.map(
@@ -248,7 +253,7 @@ function DiaryModify(props) {
         }
       </Card>
     }
-    <Button onClick={handleEditModule} style={{ margin: '20px 0' }}>编辑模块</Button>
+    <Button onClick={handleEditModule} style={{ margin: '10px 0' }}>编辑模块</Button>
     <Collapse
       defaultActiveKey={['1']}
       expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
@@ -258,7 +263,7 @@ function DiaryModify(props) {
         header={
           <>
             今日计划
-            <Button type="link" style={{ marginLeft: 20 }} onClick={handleAddItem}>编辑items</Button>
+            <Button type="link" style={{ marginLeft: 20 }} onClick={handleAddItem}>编辑今日计划</Button>
           </>
         }
         key="1">
@@ -322,8 +327,8 @@ function DiaryModify(props) {
     </Collapse>
     <div style={{ margin: '20px 0' }}>
       <Button onClick={() => setRemarkVisible(true)}>提交</Button>
-      <Button onClick={() => setTemplateVisible(true)}>设为模板</Button>
-      <Button onClick={handleSaveTemplate}>保存模板</Button>
+      <Button onClick={() => setTemplateVisible(true)} style={{ marginLeft: 10 }}>设为模板</Button>
+      { isTemplate && <Button onClick={handleSaveTemplate}>保存模板</Button> }
     </div>
     {addTodoItemVisible && <AddTodoItems onClose={handleAddTotoItemClose} selectedItems={content.todoList} /> }
     {addModuleVisible && <AddModule selectedItems={content.modules.map(({ _id, name }) => ({ _id, name }))} onClose={handleAddModuleClose}></AddModule>}
