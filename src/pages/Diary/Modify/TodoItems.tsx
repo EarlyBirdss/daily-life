@@ -21,7 +21,6 @@ const rowSource = {
 
 const rowTarget = {
   drop(props: any, monitor: any) {
-    console.log(props)
     const dragIndex = monitor.getItem().index;
     const hoverIndex = props.index;
 

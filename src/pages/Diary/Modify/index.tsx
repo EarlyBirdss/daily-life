@@ -4,15 +4,12 @@ import {
   Card,
   Button,
   Modal,
-  List,
-  Checkbox,
   Input,
   Icon,
-  Row,
-  Col,
   message,
   Collapse,
   DatePicker,
+  InputNumber,
 } from 'antd';
 import { Editor, EditorState } from 'draft-js';
 import { DndProvider, DragSource, DropTarget } from 'react-dnd';
@@ -65,8 +62,8 @@ function DiaryModify(props) {
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
   const [id, setId] = useState();
+  const [isTemplate, setIsTemplate] = useState(false);
   const onEditorChange = (editorState: any) => setEditorState(editorState);
-  let isTemplate = false;
 
   useEffect(() => {
     const { match: { params } } = props;
@@ -83,7 +80,7 @@ function DiaryModify(props) {
         });
     } else if (params.templateId) {
       setId(params.templateId);
-      isTemplate = true;
+      setIsTemplate(true);
       fetchTemplateDetail({ _id: params.templateId })
         .then(({ data = {} }: { data: ContentProps }) => {
           setContent(data);
@@ -148,7 +145,7 @@ function DiaryModify(props) {
   const handleSumbit = () => {
     form.validateFields((err: any, values: any) => {
       const data = formatPostData(values);
-      saveDiary({ _id: id, remark, ...data })
+      saveDiary({ _id: id, date: new Date(values.date), dayIndex: values.dayIndex, remark, ...data })
         .then(() => {
           message.success('日志已更新');
           setRemark('');
@@ -198,7 +195,6 @@ function DiaryModify(props) {
     });
 
     return {
-      date: new Date(data.date),
       todoList: Object.keys(todoList).map(key => todoList[key]),
       modules: Object.keys(modules).map(key => modules[key])
     };
@@ -231,13 +227,22 @@ function DiaryModify(props) {
     <div className="cb-panel">
     {
       !isTemplate && <Card title="日志日期" style={{ marginBottom: 15 }}>
-        <Form.Item style={{ marginBottom: 0 }}>
-          {
-            form.getFieldDecorator('date', {
-              initialValue: new moment(),
-            })(<DatePicker />)
-          }
-        </Form.Item>
+        <Form layout="inline">
+          <Form.Item style={{ marginBottom: 0 }}>
+            {
+              form.getFieldDecorator('date', {
+                initialValue: new moment(),
+              })(<DatePicker placeholder="请输入" />)
+            }
+          </Form.Item>
+          <Form.Item style={{ marginBottom: 0 }} label="当前第N天">
+            {
+              form.getFieldDecorator('dayIndex', {
+                // initialValue: 1,
+              })(<InputNumber placeholder="请输入" style={{ width: 160 }} />)
+            }
+          </Form.Item>
+        </Form>
       </Card>
     }
     { !!templateList.length &&
@@ -326,9 +331,13 @@ function DiaryModify(props) {
     }
     </Collapse>
     <div style={{ margin: '20px 0' }}>
-      <Button onClick={() => setRemarkVisible(true)}>提交</Button>
-      <Button onClick={() => setTemplateVisible(true)} style={{ marginLeft: 10 }}>设为模板</Button>
-      { isTemplate && <Button onClick={handleSaveTemplate}>保存模板</Button> }
+      { !isTemplate ?
+        <>
+          <Button onClick={() => setRemarkVisible(true)}>提交</Button>
+          <Button onClick={() => setTemplateVisible(true)} style={{ marginLeft: 10 }}>设为模板</Button>
+        </> :
+        <Button onClick={handleSaveTemplate}>保存模板</Button>
+      }
     </div>
     {addTodoItemVisible && <AddTodoItems onClose={handleAddTotoItemClose} selectedItems={content.todoList} /> }
     {addModuleVisible && <AddModule selectedItems={content.modules.map(({ _id, name }) => ({ _id, name }))} onClose={handleAddModuleClose}></AddModule>}

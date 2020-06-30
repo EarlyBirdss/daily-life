@@ -18,6 +18,7 @@ import {
   Popconfirm,
   message,
   Modal,
+  Input,
 } from 'antd';
 import moment from 'moment';
 import { ONLY_DATE_FORMAT, PLACEHOLDER_LABEL } from '@/configs/constant.config';
@@ -74,7 +75,20 @@ const QueryForm = (props: QueryFormProps) => {
           {getFieldDecorator('dateRange')(<DatePicker.RangePicker />)}
         </Form.Item>
         <Form.Item label="当前第N天">
-          {getFieldDecorator('day')(<InputNumber placeholder="请输入" min={0} />)}
+          <Input.Group compact>
+          {getFieldDecorator('dayIndexMin')(<InputNumber style={{ width: 100, textAlign: 'center' }} placeholder="Minimum" />)}
+            <Input
+              style={{
+                width: 30,
+                borderLeft: 0,
+                pointerEvents: 'none',
+                backgroundColor: '#fff',
+              }}
+              placeholder="~"
+              disabled
+            />
+            {getFieldDecorator('dayIndexMax')(<InputNumber style={{ width: 100, textAlign: 'center', borderLeft: 0 }} placeholder="Maximum" />)}
+          </Input.Group>
         </Form.Item>
         <Form.Item label="模块">
           {getFieldDecorator('modules')(
@@ -107,11 +121,11 @@ const QueryForm = (props: QueryFormProps) => {
                 </Select>)}
             </Form.Item>
         }
-        <Form.Item label="是否已完成">
+        {/* <Form.Item label="是否已完成">
           {getFieldDecorator('isCompleted', {
             valuePropName: 'checked'
           })(<Switch checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="close" />} />)}
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item style={{ float: 'right' }}>
           <Button type="primary" htmlType="submit" style={{ marginRight: 10 }}>查询</Button>
           <Button onClick={handleReset}>重置</Button>

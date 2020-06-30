@@ -6,7 +6,6 @@ import { login, register } from './service';
 
 function LoginModal(props: LoginModalProps) {
   const { visible, type = '', onClose, form } = props;
-  console.log(props)
   const formLayout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },

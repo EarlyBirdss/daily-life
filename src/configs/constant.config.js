@@ -16,7 +16,7 @@ export const ControllerType = {
 
 export const UserInfoInputType = {
   REGISTER: 'REGISTER',
-  LOGIN: 'LOGIN',
+  LOGIN: 'LOGON',
   EDIT: 'EDIT',
 };
 

@@ -9,7 +9,7 @@ export default function Welcome() {
         icon={<div className="welcome-icon" />}
         title="WELCOME!"
         subTitle="Welcome to Mathilda's Little Cabin. Get started and record anything related your life, then tell yourself how pleased you are!"
-        extra={<Button type="primary">GO THIS WAY</Button>}
+        extra={<Button type="primary" href="/#/diary/list">GO THIS WAY</Button>}
       />
     </>
   )

@@ -29,7 +29,6 @@ export default function LoginBar() {
 
   const onClose = function(isFresh: boolean) {
     setModalConfig({ visible: false });
-    console.log(isFresh);
     isFresh && setFreshCount(freshCount + 1);
   };
 
