@@ -22,7 +22,6 @@ import AddTodoItems from './AddTodoItems';
 import TodoItems from './TodoItems';
 import AddModule from './AddModule';
 import './index.less';
-import Item from 'antd/lib/list/Item';
 
 function getController(type: string, options?: ControllerProps = {}) {
   const {

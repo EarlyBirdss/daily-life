@@ -25,11 +25,13 @@ export default function LoginBar() {
   const handleLoginOut = function() {
     localStorage.removeItem(STORAGE_USER_KEY);
     setUserInfo(null);
+    window.history.go();
   };
 
   const onClose = function(isFresh: boolean) {
     setModalConfig({ visible: false });
-    isFresh && setFreshCount(freshCount + 1);
+    // isFresh && setFreshCount(freshCount + 1);
+    isFresh && window.history.go();
   };
 
   useEffect(() => {
